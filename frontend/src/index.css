@@ -12,3 +12,12 @@
 *{
       font-family: "Outfit", sans-serif;
 }
+
+
+
+@theme {
+     --color-primary  : #2563EB;
+     --color-primary-dull : #1f58db ;
+     --color-light :#f1f5f9 ;
+     --color-borderColor : #c4c7d2;
+}
