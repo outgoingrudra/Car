@@ -7,7 +7,7 @@ export default function Hero() {
       
 
       <h1 className='text-4xl md:text-5xl font-semibold'>Luxury Cars on Rent</h1>
-      <form action=" ">
+      <form action=" " className=''>
 
 
       </form>
