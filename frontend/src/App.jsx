@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import Navbar from './Components/Navbar'
 import Home from "../src/Pages/Home"
+import Cars from "../src/Pages/Cars"
+import CarDetails from './Pages/CarDetails'
+import MyBookings from './Pages/MyBookings'
+
 import { Route, Routes, useLocation } from 'react-router-dom'
 
 export default function App() {
