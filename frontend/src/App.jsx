@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Navbar from './Components/Navbar'
-import { useLocation } from 'react-router-dom'
+import Home from "../src/Pages/Home"
+import { Route, Routes, useLocation } from 'react-router-dom'
 
 export default function App() {
 
@@ -12,6 +13,12 @@ export default function App() {
   return (
     <>
     {!isOwnerPath &&  <Navbar setShowLogin={setShowLogin}/> }
+    <Routes>
+      <Route path='/' element={<Home/>}/>
+      <Route path='/car-details/:id' element={<CarDetails/>}/>
+      <Route path='/cars' element={<Cars/>}/>
+      <Route path='/my-bookings' element={<MyBookings/>}/>
+    </Routes>
 
     </>
   )
