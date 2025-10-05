@@ -1,7 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { assets, cityList } from '../assets/assets'
 
 export default function Hero() {
+
+  const [pickUp , setPickUp] = useState("")
   return (
     <div className='h-screen flex flex-col items-center justify-center gap-14 bg-light text-center px-6'>
       
@@ -14,7 +16,7 @@ export default function Hero() {
 
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full">
           <div className="flex flex-col items-start w-full md:w-auto">
-            <select name="" id="" required className='w-full md:w-auto px-2 py-1 outline-none bg-transparent'>
+            <select value={pickUp} onChange={(e)=>setPickUp(e.target.value)} name="" id="" required className='w-full md:w-auto px-2 py-1 outline-none bg-transparent'>
               <option value="">Pick Up Location </option>
               {
                 cityList.map((city)=>(<option value={city} key={city}>{city}</option>))
@@ -22,7 +24,7 @@ export default function Hero() {
             </select>
 
             <p className="px-2 text-sm text-gray-500 text-left md:text-center w-full">
-              Please select location
+            {pickUp ? pickUp : "  Please select location"}
             </p>
           </div>
 
