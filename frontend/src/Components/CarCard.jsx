@@ -16,11 +16,29 @@ export default function CarCard({car}) {
                 <span className='font-semibold'>{currency}{car.pricePerDay}</span>
                 <span className='text-sm text-white/80'> / day</span>
             </div>
+
+
+        </div>
+        <div className=" p-4 sm:p-5">
+            <div className="flex justify-between items-start mb-2">
+                <div className="">
+                    <h3 className="text-lg font-medium">
+                        {car.brand} {car.model}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                        {car.category}  . {car.year }
+                    </p>
+                </div>
+
+            </div>
+            <div className="mt-4 ">
+
+            </div>
+
+                
         </div>
 
-           <div className="">
-            
-           </div>
+          
     </div>
   )
 }
