@@ -48,11 +48,19 @@ export default function CarCard({car}) {
                 </div>
 
                  <div className="flex items-center text-sm text-muted-foreground">
-                    <img src={assets.users_icon} alt="" className='h-4 mr-2' />
+                    <img src={assets.car_icon} alt="" className='h-4 mr-2' />
                     <span>
-                        {car.seating_capacity} Seats
+                        {car.transmission} 
                     </span>
                 </div>
+
+                <div className="flex items-center text-sm text-muted-foreground">
+                    <img src={assets.location_icon} alt="" className='h-4 mr-2' />
+                    <span>
+                        {car.location} 
+                    </span>
+                </div>
+
 
             </div>
 
