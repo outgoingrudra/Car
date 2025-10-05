@@ -31,6 +31,14 @@ export default function Hero() {
         </div>
 
 
+         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full">
+         
+         <label htmlFor="pickup-date">Pick-Up Date </label>
+         <input type="date" name="" id="pickup-date" min={new Date().toISOString().split('T')[0]} className='text-sm text-gray-500' required />
+
+        </div>
+
+
       </form>
       <img src={assets.main_car} alt="car" className='max-h-96 w-auto object-contain' />
 
