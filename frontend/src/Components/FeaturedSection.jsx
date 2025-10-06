@@ -1,9 +1,13 @@
 import React from 'react'
 import Title from './Title'
-import {dummyCarData} from "../assets/assets"
+import {assets, dummyCarData} from "../assets/assets"
 import CarCard from "../Components/CarCard"
+import { useNavigate} from "react-router-dom"
+
 
 export default function FeaturedSection() {
+    const navigate =  useNavigate()
+
   return (
     
     <div className="    flex flex-col items-center py-24 px-6 md:px-16 lg:px-24  xl:px-32">
@@ -23,8 +27,12 @@ export default function FeaturedSection() {
           }
 
         </div>
-        <button>
-          Ex
+        <button onClick={()=>{
+          navigate('/cars')
+          scrollTo(0,0)
+        }} className='flex items-center justify-center gap-2 px-6 py-2 border border-borderColor hover:bg-gray-50 rounded-md mt-18 cursor-pointer'>
+          Explore All Cars
+          <img src={assets.arrow_icon} alt="" />
         </button>
 
     </div>
