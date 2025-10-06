@@ -1,17 +1,29 @@
 import React from 'react'
 import Title from './Title'
+import { assets } from '../assets/assets';
 
 export default function Testimonial() {
 
-     const testimonials = [
-        {   name: "Emma Rodriguez", 
-            location: "Barcelona, Spain",
-             image: "", 
-             rating: 5, 
-             testimonial: "Exceptional service and attention to detail. Everything was handled professionally and efficiently from start to finish. Highly recommended!" },
-        {  name: "Liam Johnson", address: "New York, USA", image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=200", rating: 4, review: "I’m truly impressed by the quality and consistency. The entire process was smooth, and the results exceeded all expectations. Thank you!" },
-        {   name: "Sophia Lee", address: "Seoul, South Korea", image: "https://images.unsplash.com/photo-1701615004837-40d8573b6652?q=80&w=200", rating: 5, review: "Fantastic experience! From start to finish, the team was professional, responsive, and genuinely cared about delivering great results." }
-    ];
+  const testimonials = [
+    {   
+        name: "Emma Rodriguez", 
+        location: "Barcelona, Spain",
+        image: assets.testimonial_image_1, 
+        testimonial: "I have rented a car from this platform multiple times and the experience has always been exceptional. The luxury cars are well-maintained, clean, and the booking process is incredibly smooth. Highly recommend for anyone looking for premium car rentals!" 
+    },
+    {   
+        name: "Sophia Lee", 
+        location: "Seoul, South Korea", 
+        image: assets.testimonial_image_2, 
+        testimonial: "Fantastic experience! From start to finish, the team was professional, responsive, and genuinely cared about delivering great results. The car was delivered right to my doorstep and pickup was hassle-free. Will definitely use this service again!" 
+    },
+    {   
+        name: "Michael Chen", 
+        location: "Singapore", 
+        image: assets.testimonial_image_3, 
+        testimonial: "Best car rental service I've ever used! The entire process was seamless - from browsing luxury vehicles to returning the car. Customer support was outstanding and answered all my questions promptly. Five stars all the way!" 
+    }
+];
 
   return (
    
