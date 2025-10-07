@@ -30,6 +30,30 @@ export default function Footer() {
                     </ul>
                 </div>
 
+
+                 <div>
+                    <p className='text-base font-medium  uppercase text-gray-800'>Resources  </p>
+                    <ul className='mt-3 flex flex-col gap-2 text-sm'>
+                        <li><a href="#">Help Center</a></li>
+                        <li><a href="#">Terms of Services </a></li>
+                        <li><a href="#">Privacy Policy </a></li>
+                        <li><a href="#">Insurence </a></li>
+                      
+                    </ul>
+                </div>
+
+
+                  <div>
+                    <p className='text-base font-medium  uppercase text-gray-800'>Contact  </p>
+                    <ul className='mt-3 flex flex-col gap-2 text-sm'>
+                        <li><a href="#">1234, Los Angeles</a></li>
+                        <li><a href="#">USA -North </a></li>
+                        <li><a href="#">+1 232 444 555</a></li>
+                        <li><a href="#">dummy@gmail.com  </a></li>
+                      
+                    </ul>
+                </div>
+
                 
                 
             </div>
