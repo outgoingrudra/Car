@@ -1,12 +1,13 @@
 import React from 'react'
+import {assets} from "../assets/assets"
 
 export default function Footer() {
   return (
     
-      <div className='text-gray-500/80 pt-8 px-6 md:px-16 lg:px-24 xl:px-32'>
-            <div className='flex flex-wrap justify-between gap-12 md:gap-6'>
+      <div className='px-6 md:px-16 lg:px-24 xl:px-32 mt-60 text-sm text-gray-500'>
+            <div className='flex flex-wrap justify-between items-start gap-8 pb-6 border-borderColor md:gap-6'>
                 <div className='max-w-80'>
-                    <img src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/dummyLogo/dummyLogoColored.svg" alt="logo" className='mb-4 h-8 md:h-9' />
+                    <img src={assets.logo} alt="logo" className='mb-4 h-8 md:h-9' />
                     <p className='text-sm'>
                         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text
                     </p>
