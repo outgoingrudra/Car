@@ -5,7 +5,7 @@ export default function Footer() {
   return (
     
       <div className='px-6 md:px-16 lg:px-24 xl:px-32 mt-60 text-sm text-gray-500'>
-            <div className='flex flex-wrap justify-between items-start gap-8 pb-6 border-borderColor md:gap-6'>
+            <div className='flex flex-wrap justify-between items-start gap-8 pb-6 border-b  border-borderColor md:gap-6'>
                 <div className='max-w-80'>
                     <img src={assets.logo} alt="logo" className='h-8 md:h-9' />
                     <p className='max-w-80 mt-3'>
@@ -57,13 +57,12 @@ export default function Footer() {
                 
                 
             </div>
-            <hr className='border-gray-300 mt-8' />
             <div className='flex flex-col md:flex-row gap-2 items-center justify-between py-5'>
-                <p>© {new Date().getFullYear()} <a href="https://prebuiltui.com">PrebuiltUI</a>. All rights reserved.</p>
+                <p>© {new Date().getFullYear()} <a href="https://prebuiltui.com">PrebuiltUI</a>. All rights reserved. - <a href="https://github.com/outgoingrudra"><b>Rudra Verma</b></a></p>
                 <ul className='flex items-center gap-4'>
-                    <li><a href="#">Privacy</a></li>
-                    <li><a href="#">Terms</a></li>
-                    <li><a href="#">Sitemap</a></li>
+                    <li><a href="#">Privacy</a> <span> | </span>  </li>
+                    <li><a href="#">Terms</a><span> | </span></li>
+                    <li><a href="#">Sitemap</a><span> | </span></li>
                 </ul>
             </div>
         </div>

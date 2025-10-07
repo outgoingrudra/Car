@@ -6,6 +6,7 @@ import CarDetails from './Pages/CarDetails'
 import MyBookings from './Pages/MyBookings'
 
 import { Route, Routes, useLocation } from 'react-router-dom'
+import Footer from './Components/Footer'
 
 export default function App() {
 
@@ -23,6 +24,7 @@ export default function App() {
       <Route path='/cars' element={<Cars/>}/>
       <Route path='/my-bookings' element={<MyBookings/>}/>
     </Routes>
+  {!isOwnerPath &&  <Footer/> }
 
     </>
   )
