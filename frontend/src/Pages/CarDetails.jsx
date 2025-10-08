@@ -21,9 +21,19 @@ export default function CarDetails() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 ">
 
-        {/* car image and details */}
+        {/* left :car image and details */}
 
-        
+        <div className="lg:col-span-2">
+          <img src={car.image} className='w-full h-auto md:max-h-100 object-cover rounded-xl mb-6 shadow-md ' alt="" />
+          <div className="">
+            
+          </div>
+
+        </div>
+
+
+        {/* right : Booking form  */}
+        <form action="" className=""></form>
 
       </div>
 
