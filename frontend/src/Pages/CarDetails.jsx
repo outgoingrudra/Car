@@ -25,8 +25,18 @@ export default function CarDetails() {
 
         <div className="lg:col-span-2">
           <img src={car.image} className='w-full h-auto md:max-h-100 object-cover rounded-xl mb-6 shadow-md ' alt="" />
-          <div className="">
+          <div className="space-y-6 ">
+            <div className="">
+              <h1 className="text-3xl font-bold ">
+                {car.brand} {car.model}
+              </h1>
+              <p className="text-gray-500 text-lg ">
+                {car.category} {car.year}
+              </p>
+            </div>
+            <hr className="border-borderColor my-6 " />
             
+
           </div>
 
         </div>
