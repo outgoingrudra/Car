@@ -44,11 +44,18 @@ export default function CarDetails() {
                   {icon : assets.location_icon , text : car.location },
                 ].map(({icon,text})=>(
                   <div key={text} className="flex flex-col items-center bg-light p-4 rounded-lg ">
-                    <img src="" alt="" />
+                    <img src={icon} alt="" className='h-5 mb-2 '/>
+                    {text}
 
                   </div>
                 ))
               }
+            </div>
+            {/* {description } */}
+            <div className="">
+              <h1 className="text-xl font-medium mb-3 ">Description</h1>
+              <p className="text-gray-500">{car.description}</p>
+
             </div>
 
           </div>
