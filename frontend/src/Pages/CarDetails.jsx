@@ -35,7 +35,21 @@ export default function CarDetails() {
               </p>
             </div>
             <hr className="border-borderColor my-6 " />
-            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 ">
+              {
+                [
+                  {icon : assets.users_icon , text : `${car.seating_capacity} Seats `},
+                  {icon : assets.fuel_icon , text : car.fuel_type },
+                  {icon : assets.car_icon , text : car.transmission },
+                  {icon : assets.location_icon , text : car.location },
+                ].map(({icon,text})=>(
+                  <div key={text} className="flex flex-col items-center bg-light p-4 rounded-lg ">
+                    <img src="" alt="" />
+
+                  </div>
+                ))
+              }
+            </div>
 
           </div>
 
