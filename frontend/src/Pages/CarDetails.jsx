@@ -80,18 +80,41 @@ export default function CarDetails() {
 
 
         {/* right : Booking form  */}
-        <form action="" className="shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6text-gray-500">
+       <form action="" className="shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6 text-gray-500">
 
-           <p className="flex items-center justify-between text-2xl font-bold text-gray-800 ">
-           {currency} {car.pricePerDay} <span className='text-gray-500 font-normal'>/day</span>
-           </p>
+  <p className="flex items-center justify-between text-2xl font-bold text-gray-800">
+    {currency} {car.pricePerDay} <span className="text-gray-500 font-normal">/day</span>
+  </p>
 
-           <hr className="border-borderColor my-6" />
-           <div className="">
-            <label htmlFor="pickup-date">Pick Up</label>
-            <input type="date" name="" id="pickup-date" className='border border-borderColor px-3 py-2 rounded-lg   ' min={new Date().toISOString().split("T")[0]} required />
-           </div>
-        </form>
+  <hr className="border-borderColor my-6 text-gray-500" />
+
+  <div className="flex flex-col gap-2">
+    <label htmlFor="pickup-date" className="text-gray-500">Pick Up</label>
+    <input
+      type="date"
+      id="pickup-date"
+      className="border border-borderColor px-3 py-2 rounded-lg"
+      min={new Date().toISOString().split('T')[0]}
+      required
+    />
+  </div>
+
+  <div className="flex flex-col gap-2">
+    <label htmlFor="return-date" className="text-gray-500">Return Date</label>
+    <input
+      type="date"
+      id="return-date"
+      className="border border-borderColor px-3 py-2 rounded-lg"
+      required
+    />
+  </div>
+
+  <button className="w-full bg-primary text-white my-2 py-3 rounded-lg font-medium hover:bg-primaryDark transition-colors">
+    Book Now
+  </button>
+
+  <p>No credit card required to reserve</p>
+</form>
 
       </div>
 
