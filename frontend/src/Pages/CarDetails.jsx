@@ -6,6 +6,7 @@ import Loader from '../Components/Loader'
 export default function CarDetails() {
   const {id} = useParams()
   const navigate = useNavigate()
+  const currency = import.meta.env.VITE_CURRENCY
 
   const [car , setCar] = useState(null)
 
@@ -79,7 +80,18 @@ export default function CarDetails() {
 
 
         {/* right : Booking form  */}
-        <form action="" className=""></form>
+        <form action="" className="shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6text-gray-500">
+
+           <p className="flex items-center justify-between text-2xl font-bold text-gray-800 ">
+           {currency} {car.pricePerDay} <span className='text-gray-500 font-normal'>/day</span>
+           </p>
+
+           <hr className="border-borderColor my-6" />
+           <div className="">
+            <label htmlFor="pickup-date">Pick Up</label>
+            <input type="date" name="" id="pickup-date" className='border border-borderColor px-3 py-2 rounded-lg   ' min={new Date().toISOString().split("T")[0]} required />
+           </div>
+        </form>
 
       </div>
 
