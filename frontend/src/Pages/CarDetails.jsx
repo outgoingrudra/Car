@@ -58,6 +58,20 @@ export default function CarDetails() {
 
             </div>
 
+            {/* features */}
+
+            <div className="text-xl font-medium mb-3 ">Features</div>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {
+                ["360 Camera","Bluetooth","Remote Start","Sunroof","USB Port"].map((feature)=>(
+                  <li key={feature} className="flex items-center text-gray-500 ">
+                    <img src={assets.check_icon} alt="" className='h-4 mr-2 '/>
+                    {feature}
+                    </li>
+                ))
+              }
+            </ul>
+
           </div>
 
         </div>
