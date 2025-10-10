@@ -10,6 +10,11 @@ export default function CarDetails() {
 
   const [car, setCar] = useState(null);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert("Booking functionality is not implemented yet.");
+  }
+
   useEffect(() => {
     setCar(dummyCarData.find((car) => (car._id = id)));
   }, [id]);
@@ -92,7 +97,7 @@ export default function CarDetails() {
         </div>
 
         {/* right : Booking form  */}
-        <form
+        <form onSubmit={handleSubmit}
           action=""
           className="shadow-lg h-max sticky top-18 rounded-xl p-6 space-y-6 text-gray-500"
         >
