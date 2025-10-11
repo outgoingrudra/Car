@@ -20,6 +20,30 @@ export default function MyBookings() {
 
      <Title title="My Bookings " subTitle=" View and manage your all car bookings "/>
 
+     <div className="">
+      {
+        bookings.map((booking,index)=>(
+          <div className="grid grid-cols-1 md:grid-cols-4  gap-6 p-6 border border-borderColor rounded-lg mt-5 first:mt-12 " key={index}>
+              {/* car image and info */}
+
+              <div className="md:col-span-1">
+                <div className="rounded-md overflow-hidden mb-3 ">
+                  <img src={booking.car.image} alt="" className='w-full h-auto aspect-video object-cover' />
+
+                </div>
+                <p className="text-lg font-medium mt-2 ">
+                  {booking.car.brand} {booking.car.model}
+                </p>
+                <p className="text-gray-500">
+                  {booking.car.year}  . {booking.car.category} . {booking.car.location}
+                </p>
+
+              </div>
+          </div>
+        ))
+      }
+     </div>
+
     </div>
   )
 }
