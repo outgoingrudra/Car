@@ -4,6 +4,7 @@ import Title from "../Components/Title";
 
 export default function MyBookings() {
   const [bookings, setBookings] = React.useState([]);
+  const currency = import.meta.env.VITE_CURRENCY;
 
   const fetchBookings = async () => {
     setBookings(dummyMyBookingsData);
@@ -94,15 +95,24 @@ export default function MyBookings() {
                 </div>
               </div>
 
-
-              {/* prices  */}
-
-              
-
-
-
-
             </div>
+
+            {/* prices  */}
+
+              <div className="md:col-span-1 flex flex-col justify-between gap-6 ">
+                <div className="text-sm text-gray-500 text-right ">
+                  <p className="">
+                    Total Price
+                  </p>
+                  <h1 className="text-2xl font-semibold text-primary">
+                  {currency}  {booking.price} 
+                  </h1>
+                  <p className="">
+                    Booked on {booking.createdAt.split("T")[0]}
+                  </p>
+                </div>
+
+              </div>
           </div>
         ))}
       </div>
