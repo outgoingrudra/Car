@@ -61,6 +61,8 @@ export default function MyBookings() {
                   {booking.status}{" "}
                 </p>
               </div>
+
+
               <div className="flex items-start gap-2 mt-3">
                 <img
                   src={assets.calendar_icon_colored}
@@ -71,10 +73,35 @@ export default function MyBookings() {
                 <div className="">
                   <p className=" text-gray-500">Rental Period</p>
                   <p className="">
-                    {booking.pickupDate("T")[0]} to {booking.returnDate("T")[0]}
+                    {booking.pickupDate.split("T")[0]} to {booking.returnDate.split("T")[0]}
                   </p>
                 </div>
               </div>
+
+
+              <div className="flex items-start gap-2 mt-3">
+                <img
+                  src={assets.location_icon_colored}
+                  className="w-4 h-4 mt-1"
+                  alt=""
+                />
+
+                <div className="">
+                  <p className=" text-gray-500">Pick Up Location </p>
+                  <p className="">
+                   {booking.car.location}
+                  </p>
+                </div>
+              </div>
+
+
+              {/* prices  */}
+
+              
+
+
+
+
             </div>
           </div>
         ))}
