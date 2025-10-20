@@ -1,7 +1,11 @@
 import React from 'react'
 
-export default function Title() {
+export default function Title({title , subTitle}) {
+    
   return (
-    <div>Title</div>
+   <>
+     <h1 className="font-medium text-3xl">{title}</h1>
+     <p className="text-sm md:text-base text-gray-500/90 mt-2 max-w-156 ">{subTitle}</p>
+   </>
   )
 }
