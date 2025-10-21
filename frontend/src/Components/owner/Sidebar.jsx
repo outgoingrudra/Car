@@ -1,5 +1,5 @@
 import React from "react";
-import { dummyUserData } from "../../assets/assets";
+import { assets, dummyUserData } from "../../assets/assets";
 import { useLocation } from "react-router-dom";
 
 export default function Sidebar() {
@@ -25,9 +25,24 @@ export default function Sidebar() {
             alt=""
             className=""
           />
-          
+          <input type="file" id="image" accept="image/*" hidden onChange={(e)=>setImage(e.target.files[0])} />
+
+          <div className="absolute hidden top-0 right-0 left-0  bottom-0 bg-black/10 rounded-full  justify-center items-center group-hover:flex cursor-pointer">
+               <img src={assets.edit_icon} alt="" />
+
+
+          </div>
         </label>
       </div>
+      {image && (
+
+        <button onClick={updateImage} className="absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer ">
+          Save <img src={assets.check_icon} width={13} alt="" />
+        </button>
+      )}
+      <p className="">
+        
+      </p>
     </div>
   );
 }
