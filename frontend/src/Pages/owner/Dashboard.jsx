@@ -1,6 +1,7 @@
-import React, { use } from 'react'
+import React from 'react'
 import { useEffect } from 'react';
 import { assets, dummyDashboardData } from '../../assets/assets';
+import Title from '../../Components/owner/Title.jsx'
 
 export default function Dashboard() {
 
@@ -22,9 +23,14 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Fetch dashboard data from API
+    console.log(dummyDashboardData)
     setData(dummyDashboardData);
   }, []);
   return (
-    <div>Dashboard</div>
+   <div className="px-4 pt-10 md:px-10 flex-1 ">
+    <Title title="Admin Dashboard"  subTitle="Monitor overall platform performance including total cars , bookings , revenue and recent activites" />
+
+    
+   </div>
   )
 }

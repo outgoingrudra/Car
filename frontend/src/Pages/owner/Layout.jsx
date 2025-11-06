@@ -5,14 +5,12 @@ import { Outlet } from 'react-router-dom'
 
 export default function Layout() {
   return (
-    <div className='flex flex-col '>
+    <div className='flex flex-col min-h-screen'>
       <NavbarOwner />
-      <div className="">
+      <div className="flex flex-1">
         <Sidebar />
-        <Outlet/>
+        <Outlet />
       </div>
-
-
     </div>
   )
 }
