@@ -53,6 +53,36 @@ export default function Dashboard() {
             }
      </div>
     
+{/* recent bookings */}
+    <div className="flex felx-wrap items-start gap-6 mb-6 w-full">
+
+
+       <div className="p-4 md:p-6 border border-borderColor rounded-md w-full max-w-lg ">
+        <h1 className="text-lg font-medium">Recent Bookings </h1>
+        <p className="text-gray-500">
+          Latest Customer Bookings 
+        </p>
+        {
+          data.recentBookings.map((booking , index) => (
+            <div key={index} className="mt-4 flex items-center justify-between ">
+                      <div className="flex items-center gap-2">
+                           <div className="">
+                            <img src={assets.listIconColored} alt="" className='h-5 w-5 ' />
+                           </div>
+                      </div>
+            </div>
+          ))
+        }
+
+       </div>
+
+
+    </div>
+
+    {/* monthly revenue  */}
+    <div className=""></div>
+
+
    </div>
   )
 }
