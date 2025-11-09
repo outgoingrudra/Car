@@ -4,6 +4,7 @@ import { assets, dummyDashboardData } from '../../assets/assets';
 import Title from '../../Components/owner/Title.jsx'
 
 export default function Dashboard() {
+  const currency = import.meta.env.VITE_CURRENCY ; 
 
   const [data , setData] = React.useState({
     totalCars : 0,
@@ -69,6 +70,18 @@ export default function Dashboard() {
                            <div className="">
                             <img src={assets.listIconColored} alt="" className='h-5 w-5 ' />
                            </div>
+                      </div>
+
+                      <div className="">
+                        <p className="">{booking.car.brand} {booking.car.model}</p>
+                        <p className="text-sm text-gray-500">
+                          {booking.createdAt.split('T')[0]}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 font-medium">
+                        <p className="text-sm text-gray-500">{currency} {booking.price}</p>
+                        <p className="px-3 py-0.5 border border-borderColor rounded-full  text-sm ">{booking.status}</p>
+
                       </div>
             </div>
           ))
