@@ -40,6 +40,20 @@ export default function AddCar() {
              </div>
 
              {/* car brand and model  */}
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+              <div className="flex flex-col w-full">
+                <label htmlFor="">Brand </label>
+                <input type="text" placeholder='e.g- BMW , Mercedes ...' required className='px-3 py-2 
+                mt-1  border border-borderColor rounded-md outline-none' value={car.brand} onChange={(e)=>setCar({...car,brand :e.target.value})} />
+              </div>
+              <div className="flex flex-col w-full">
+                <label htmlFor="">Model </label>
+                <input type="text" placeholder='e.g- X5 , E-Class ...' required className='px-3 py-2 
+                mt-1  border border-borderColor rounded-md outline-none' value={car.model} onChange={(e)=>setCar({...car,model :e.target.value})} />
+              </div>
+             </div>
+
+             
 
     </form>
    </div>
