@@ -18,6 +18,7 @@ export default function AddCar() {
     description : ""
 
   })
+  const currency = import.meta.env.VITE_CURRENCY
 
 
   const onsubmitHandler = async(e)=>{
@@ -51,6 +52,23 @@ export default function AddCar() {
                 <input type="text" placeholder='e.g- X5 , E-Class ...' required className='px-3 py-2 
                 mt-1  border border-borderColor rounded-md outline-none' value={car.model} onChange={(e)=>setCar({...car,model :e.target.value})} />
               </div>
+             </div>
+
+
+             {/* car Year , Price Category  */}
+             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
+               <div className="flex flex-col w-full">
+                <label htmlFor="">Year </label>
+                <input type="number" placeholder='e.g- 2024,2025.....' required className='px-3 py-2 
+                mt-1  border border-borderColor rounded-md outline-none' value={car.year} onChange={(e)=>setCar({...car,year :e.target.value})} />
+              </div>
+
+              <div className="flex flex-col w-full">
+                <label htmlFor="">daily Price ({currency})</label>
+                <input type="text" placeholder='e.g- 100' required className='px-3 py-2 
+                mt-1  border border-borderColor rounded-md outline-none' value={car.pricePerDay} onChange={(e)=>setCar({...car,pricePerDay :e.target.value})} />
+              </div>
+
              </div>
 
              
