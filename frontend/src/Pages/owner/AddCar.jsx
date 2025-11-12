@@ -30,14 +30,16 @@ export default function AddCar() {
     
     <form action="" onSubmit={onsubmitHandler} className='flex flex-col gap-5 text-gray-500 text-sm mt-6 max-w-xl'>
              {/* car image  */}
-             <div className="">
+             <div className="flex items-center  gap-2 w-full">
               <label htmlFor="car-image">
                 <img src={image ? URL.createObjectURL(image) : assets.upload_icon} alt="" 
                 className='h-14 rounded cursor-pointer'/>
-                <input type="file" name="" id="car-image"  accept='image/*' hidden/>
+                <input type="file" name="" id="car-image"  accept='image/*' hidden onChange={(e)=>setImage(e.target.files[0])}/>
               </label>
               <p className='text-sm text-gray-500'> Upload a picture of the car</p>
              </div>
+
+             {/* car brand and model  */}
 
     </form>
    </div>
