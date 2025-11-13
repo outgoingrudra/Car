@@ -136,6 +136,14 @@ export default function AddCar() {
                  </select>
               </div>
               {/* car description */}
+              <div className="flex flex-col w-full">
+                <label htmlFor="">Description</label>
+                <textarea rows={5}  placeholder='Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi, inventore.' required className='px-3 py-2 
+                mt-1  border border-borderColor rounded-md outline-none' value={car.description} onChange={(e)=>setCar({...car,description :e.target.value})} ></textarea>
+              </div>
+              
+
+
 
              </div>
 
