@@ -69,6 +69,18 @@ export default function AddCar() {
                 mt-1  border border-borderColor rounded-md outline-none' value={car.pricePerDay} onChange={(e)=>setCar({...car,pricePerDay :e.target.value})} />
               </div>
 
+              <div className="flex flex-col w-full">
+                 <label htmlFor="">Category</label>
+                 <select name="" id=""  
+                 className='px-3 py-2 mt-1 border border-borderColor rounded-md outline-none'
+                 onChange={(e)=>setCar({...car,category:e.target.value})} value={car.category}>
+                  <option value="">Select a category</option>
+                  <option value="Sedan">Sedan</option>
+                  <option value="SUV">SUV</option>
+                  <option value="VAN">VAN</option>
+                 </select>
+              </div>
+
              </div>
 
              
