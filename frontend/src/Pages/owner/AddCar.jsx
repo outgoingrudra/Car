@@ -83,6 +83,26 @@ export default function AddCar() {
 
              </div>
 
+             {/* car transmission , Fuel Type , Seating Capacity  */}
+
+             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
+
+               <div className="flex flex-col w-full">
+                 <label htmlFor="">Transmission</label>
+                 <select name="" id=""  
+                 className='px-3 py-2 mt-1 border border-borderColor rounded-md outline-none'
+                 onChange={(e)=>setCar({...car,transmission :e.target.value})} value={car.transmission}>
+                  <option value="">Select a transmission</option>
+                  <option value="Automatic">Automatic</option>
+                  <option value="Manual">Manual</option>
+                  <option value="Semi-Manual">Semi-Manual</option>
+                 </select>
+              </div>
+
+              
+
+             </div>
+
              
 
     </form>
