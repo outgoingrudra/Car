@@ -22,6 +22,8 @@ export default function AddCar() {
 
 
   const onsubmitHandler = async(e)=>{
+    e.prevantDefault()
+    console.log(car)
          
   }
 
@@ -65,7 +67,7 @@ export default function AddCar() {
 
               <div className="flex flex-col w-full">
                 <label htmlFor="">daily Price ({currency})</label>
-                <input type="text" placeholder='e.g- 100' required className='px-3 py-2 
+                <input type="number" placeholder='e.g- 100' required className='px-3 py-2 
                 mt-1  border border-borderColor rounded-md outline-none' value={car.pricePerDay} onChange={(e)=>setCar({...car,pricePerDay :e.target.value})} />
               </div>
 
