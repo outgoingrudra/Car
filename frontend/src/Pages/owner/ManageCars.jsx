@@ -5,6 +5,7 @@ import Title from "../../Components/owner/Title"
 export default function ManageCars() {
 
   const [cars ,setCars ] =  useState([])
+    const currency = import.meta.env.VITE_CURRENCY ; 
 
   const fetchOwnerCars= async()=>{
      setCars(dummyCarData)
@@ -40,6 +41,8 @@ export default function ManageCars() {
 
                   </div>
                 </td>
+                <td className="p-3 max-md:hidden">{car.category} </td>
+                <td className="p-3 max-md:hidden">{currency} {car.pricePerDay} /day </td>
 
               </tr>
             ))
