@@ -42,7 +42,9 @@ export default function ManageCars() {
                   </div>
                 </td>
                 <td className="p-3 max-md:hidden">{car.category} </td>
-                <td className="p-3 max-md:hidden">{currency} {car.pricePerDay} /day </td>
+                <td className="p-3 ">{currency} {car.pricePerDay} /day </td>
+                  <td className="p-3 max-md:hidden">
+                    <span className={`px-3 py-1 rounded-full text-xs ${car.isAvaliable ? "bg-green-100 text-green-500" : "bg-red-100 text-red-500"}`}>  {car.isAvaliable? "Avaliable" :"Unavaliable"} </span> </td>
 
               </tr>
             ))
