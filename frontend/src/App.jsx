@@ -12,6 +12,7 @@ import ManageBookings from './Pages/Owner/ManageBookings'
 
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Footer from './Components/Footer'
+import Login from './Components/Login'
 
 export default function App() {
 
@@ -21,7 +22,12 @@ export default function App() {
     const isOwnerPath =  useLocation().pathname.startsWith('/owner')
 
   return (
+    
     <>
+
+   {
+    showLogin &&  <Login setShowLogin={setShowLogin}/>
+   }
     {!isOwnerPath &&  <Navbar setShowLogin={setShowLogin}/> }
     <Routes>
       <Route path='/' element={<Home/>}/>
