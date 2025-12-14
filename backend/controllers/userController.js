@@ -73,3 +73,14 @@ export const loginUser = async (req, res) => {
   } 
 };
 
+// get user details using token
+
+export const getUserData = async (req, res) => {
+  try {
+    const {user} = req;
+    res.json({ success: true, user });
+  } catch (error) {
+    console.log(error.message);
+    res.send({ success: false, message: error.message });
+  }
+};
