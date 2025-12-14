@@ -2,6 +2,14 @@
 import { JsonWebTokenError } from "jsonwebtoken";
 import User from "../models/user.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+// generate token function
+
+const generateToken = (id) => {
+    const payload =  id 
+    return jwt.sign(payload, process.env.JWT_SECRET);
+}
 
 export const  registerUser = async (req, res) => {
     try {
@@ -21,13 +29,19 @@ export const  registerUser = async (req, res) => {
             email,
             password: hashedPassword,
         });
+
+        const token = generateToken(user._id.toString());
      
-        res.status(201).json({ success: true, message: "User registered successfully" });
+        res.status(201).json({
+            success: true,
+           token}); 
 
 
 
 
 
     }   catch (error) {
-        res.status(500).send({ message: error.message });
+        console.log(error.message);
+        res.status(500).send({ success:false,  message: error.message });
+
     }
