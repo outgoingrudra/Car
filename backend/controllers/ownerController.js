@@ -8,3 +8,18 @@ export const changeRoleToOwner = async (req, res) => {
         res.json({success:false, message: 'Error updating role'});
     }
 }
+
+// Add to list a car
+
+export const addCar = async (req, res) => {
+    try {
+
+        const {_id } = req.user;
+        let car = JSON.parse(req.body.carData);
+        const imageFile = req.file;
+        
+        
+    } catch (error) {
+         console.log(error);
+         res.json({success:false, message: 'Error updating role'});
+    }
