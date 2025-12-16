@@ -72,9 +72,10 @@ export const toggleCarAvailability = async (req, res) => {
     try {
         const {carId} = req.params;
         const car = await Car.findById(carId);
+        const {_id} = req.user;
 
         // if car belongs to the owner
-        if(car.owner.toString() !== carId.toString()){
+        if(car.owner.toString() !== _id.toString()){
             return res.json({success:false , message: 'You are not authorized to update this car'});
         }
         car.isAvailable = !car.isAvailable;
@@ -85,3 +86,22 @@ export const toggleCarAvailability = async (req, res) => {
     }   
 }
 
+// api to delete a car
+
+export const deleteCar = async (req, res) => {
+    try {
+        const {carId} = req.params;
+        const car = await Car.findById(carId);
+        const {_id} = req.user;
+        // if car belongs to the owner
+        if(car.owner.toString() !== _id.toString()){
+            return res.json({success:false , message: 'You are not authorized to delete this car'});
+        }
+        car.owner = null ,
+        car.isAvailable = false;
+        await Car.findByIdAndDelete(carId);
+        res.json({success:true , message: 'Car deleted successfully'})
+    } catch (error) {
+        res.json({success:false, message: 'Error deleting car'});
+    }
+}
