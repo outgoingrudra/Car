@@ -55,3 +55,33 @@ export const addCar = async (req, res) => {
     }
 
 }
+
+export const getOwnerCars = async (req, res) => {
+    try {
+        const {_id } = req.user;
+        const cars = await Car.find({owner: _id});
+        res.json({success:true , cars})
+    } catch (error) {
+        res.json({success:false, message: 'Error fetching cars'});
+    }
+}
+
+// api to toggle car availability
+
+export const toggleCarAvailability = async (req, res) => {
+    try {
+        const {carId} = req.params;
+        const car = await Car.findById(carId);
+
+        // if car belongs to the owner
+        if(car.owner.toString() !== carId.toString()){
+            return res.json({success:false , message: 'You are not authorized to update this car'});
+        }
+        car.isAvailable = !car.isAvailable;
+        await car.save();
+        res.json({success:true , message: 'Car availability updated successfully'})
+    } catch (error) {
+        res.json({success:false, message: 'Error updating car availability'});
+    }   
+}
+
