@@ -40,4 +40,35 @@ export const checkCarAvailability = async(req,res) => {
     }
 }
 
-// api to book a car
+// api to create a booking
+
+export const createBooking = async(req,res) => {
+   try {
+    const {_id} = req.user;
+    const {car ,pickupDate,returnDate} = req.body;
+    const isAvailable = await checkAvailability(car,pickupDate,returnDate);
+
+    if(!isAvailable){
+        return res.status(400).json({ success : false,message: "Car is not available for the selected dates" });
+    }
+    const carData = await Car.findById(car);
+    // calculate total amount
+    const picked =  new Date(pickupDate);
+     const  returned = new Date(returnDate);
+
+     const noOfDays = Math.ceil((returned - picked) / (1000 * 60 * 60 * 24)) + 1;
+     const price = noOfDays * carData.pricePerDay;
+
+     await Booking.create({
+        car , owner :  carData.owner, user : _id , pickupDate, returnDate, price  })
+
+        res.status(200).json({ success : true,message: "Booking created successfully" });
+
+    
+   } catch (error) {
+    console.log(error);
+    res.status(500).json({  success : false,message: "Server Error" });
+    
+   }
+
+}
