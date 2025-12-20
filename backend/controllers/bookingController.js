@@ -88,3 +88,23 @@ export const getUserBookings = async(req,res) => {
     }
 
 }
+
+
+// get owner bookings
+
+export const getOwnerBookings = async(req,res) => {
+  
+    try {
+        if(req.user.role !== "owner"){
+            return res.json({ success : false,message: "Access denied" });
+        }
+        const bookings = await Booking.find({ owner : req.user._id}).populate("car user").select("-user.password").sort({ createdAt : -1});
+
+        res.status(200).json({ success : true,bookings });
+        
+    } catch (error) {
+        console.log(error);
+    res.status(500).json({  success : false,message: "Server Error" });
+    }
+
+}
