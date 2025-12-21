@@ -1,5 +1,6 @@
 // check car availability
 import Booking from "../models/Booking.js";
+import Car from "../models/Car.js";
 
 const checkAvailability = async(car,pickupDate,returnDate) => {
    const bookings = await Booking.find({
@@ -105,6 +106,32 @@ export const getOwnerBookings = async(req,res) => {
     } catch (error) {
         console.log(error);
     res.status(500).json({  success : false,message: "Server Error" });
+    }
+
+}
+
+
+// api to change booking status
+
+export const changeBookingStatus = async(req,res) => {
+
+    try {
+        
+        const {_id} = req.user;
+
+        const { bookingid , status } = req.body;
+
+        const booking = await Booking.findById(bookingid)
+        if(booking.owner.toString() !== _id.toString()){
+            return res.json({ success : false,message: "Access denied" });
+        }
+        booking.status = status;
+        await booking.save();
+
+        res.status(200).json({ success : true,message: "Booking status updated successfully" });
+
+    } catch (error) {
+        
     }
 
 }
