@@ -10,6 +10,7 @@ ownerRouter.post("/add-car",upload.single("image"), addCar);
 ownerRouter.post("/cars",protect , getOwnerCars)
 ownerRouter.post("/toggle-car",protect , toggleCarAvailability)
 ownerRouter.post("/delete-car",protect , deleteCar)
+ownerRouter.get("/dashboard",protect , getDashboardData)
 
 
 export default ownerRouter;

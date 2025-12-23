@@ -142,3 +142,22 @@ export  const getDashboardData = async (req, res) => {
         
     }
 }
+
+
+
+// api to update user image
+
+export const  updateUserImage = async (req, res) => {
+    
+    try {
+        const {_id} = req.user;
+        
+        
+    } catch (error) {
+        console.log(error);
+        res.json({ success : false,message:  error.message });
+        
+    }
+
+
+}
