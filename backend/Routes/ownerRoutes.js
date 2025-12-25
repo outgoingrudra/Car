@@ -14,4 +14,5 @@ ownerRouter.get("/dashboard",protect , getDashboardData)
 ownerRouter.post("update-image",upload.single("image"),protect,updateUserImage)
 
 
+
 export default ownerRouter;
