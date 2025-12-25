@@ -14,6 +14,8 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import Footer from './Components/Footer'
 import Login from './Components/Login'
 
+import {Toaster} from "react-hot-toast"
+
 export default function App() {
 
 
@@ -24,6 +26,7 @@ export default function App() {
   return (
     
     <>
+    <Toaster/>
 
    {
     showLogin &&  <Login setShowLogin={setShowLogin}/>
