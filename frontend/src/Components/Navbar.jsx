@@ -1,13 +1,35 @@
 import React, { useState } from 'react'
 import {assets, menuLinks} from "../assets/assets"
 import {Link, useLocation, useNavigate} from "react-router-dom"
+import {useAppContext} from "../Context/AppContext"
+import toast from 'react-hot-toast'
 
-export default function Navbar({setShowLogin}) {
+export default function Navbar() {
+  const {setShowLogin,user,logout , isOwner , setIsOwner , axios } = useAppContext
 
   const location =  useLocation()
   const [open,setOpen] =  useState(false)
 
   const navigate =  useNavigate()
+  const changeRole = async()=>{
+    try {
+    const {data} =  await axios.post("/api/owner/change-role")
+    if(data.success)
+    {
+      setIsOwner(true)
+      toast.success(data.message)
+    }
+    else{
+      toast.error(data.message)
+      console.log("error in Navbar file");
+      
+    }
+    } catch (error) {
+      toast.error(error.message)
+      console.log("error in Navbar file");
+      
+    }
+  }
 
   return (
     <div className={`flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 text-gray-600 border-b border-borderColor relative transition-all
@@ -41,8 +63,8 @@ export default function Navbar({setShowLogin}) {
        
 
        <div className="flex w-full sm:w-auto max-sm:flex-col items-start sm:items-center gap-4 sm:gap-6">
-        <button onClick={()=>navigate("/owner")} className='cursor-pointer w-full sm:w-auto text-left sm:text-center'>Dashboard</button>
-        <button onClick={()=>setShowLogin(true)} className='cursor-pointer px-8 py-2 w-full sm:w-auto bg-blue-700 hover:bg-blue-500 transition-all text-white rounded-lg'>login</button>
+        <button onClick={()=>{isOwner ? navigate("/owner") : changeRole}} className='cursor-pointer w-full sm:w-auto text-left sm:text-center'>{isOwner ? "Dashboard" : "List Cars"}</button>
+        <button onClick={()=>{user ? logout() : setShowLogin(true)}} className='cursor-pointer px-8 py-2 w-full sm:w-auto bg-blue-700 hover:bg-blue-500 transition-all text-white rounded-lg'>{user ? "Log Out":"Log In"}</button>
        </div>
 
       </div>
