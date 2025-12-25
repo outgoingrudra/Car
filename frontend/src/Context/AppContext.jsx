@@ -20,7 +20,7 @@ export const AppProvider =({children})=>{
     const [cars , setCars ] = useState([])
 
     //fun to check user logged in
-    const fetchUser = async(){
+    const fetchUser = async()=>{
         try {
          const {data} =  await axios.get("/api/user/data")
          if(data.success) 
@@ -33,15 +33,40 @@ export const AppProvider =({children})=>{
         }
 
         } catch (error) {
+             console.log("error in app context file in user fetch");
+
             toast.error(error.message)
             
         }
+    }
+    //fun to fetch all cars
+    const fetchCars = async()=>
+    {
+        try {
+            const {data} = await axios.get("api/user/cars")
+            data.success ? setCars(data) : toast.error(data.message)
+            
+        } catch (error) {
+            console.log("error in app context file in fetching cars");
+            toast.error(error.message)
+            
+        }
+    }
+    //func to log out user
+    const logout = ()=>{
+        localStorage.removeItem("token")
+        setToken(null)
+        setUser(null)
+        setIsOwner(false)
+        axios.defaults.headers.common['Authorization']=""
+        toast.success("Log out Successfully !")
     }
 
     //use effect to retrieve token from local storage
     useEffect(()=>{
         const token = localStorage.getItem("token")
         setToken(token)
+        fetchCars()
     },[])
 
     //use effect to fetch user data from token
@@ -55,6 +80,8 @@ export const AppProvider =({children})=>{
     const value ={
         navigate, 
         currency ,
+        axios , user, setUser, token , setToken , isOwner,setIsOwner , fetchUser, showLogin,setShowLogin,logout,
+        fetchCars,cars,setCars ,pickupDate,setPickupDate,returnDate,setReturnDate
 
     }
 
