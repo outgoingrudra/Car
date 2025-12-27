@@ -40,18 +40,29 @@ export const AppProvider =({children})=>{
         }
     }
     //fun to fetch all cars
-    const fetchCars = async()=>
-    {
-        try {
-            const {data} = await axios.get("api/user/cars")
-            data.success ? setCars(data) : toast.error(data.message)
-            
-        } catch (error) {
-            console.log("error in app context file in fetching cars");
-            toast.error(error.message)
-            
+   const fetchCars = async () => {
+    try {
+        const { data } = await axios.get("/api/users/cars")
+        if (data.success) {
+            setCars(data.cars)
+        } else {
+            toast.error(data.message || "Failed to fetch cars")
+        }
+    } catch (error) {
+        console.log("Error fetching cars:", error)
+        // Check if it's an axios error with response
+        if (error.response) {
+            // Server responded with error status
+            toast.error(error.response.data?.message || "Server error")
+        } else if (error.request) {
+            // Request made but no response
+            toast.error("Network error. Please check your connection.")
+        } else {
+            // Something else
+            toast.error(error.message || "Failed to fetch cars")
         }
     }
+}
     //func to log out user
     const logout = ()=>{
         localStorage.removeItem("token")
