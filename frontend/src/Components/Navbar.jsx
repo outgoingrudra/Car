@@ -5,7 +5,7 @@ import {useAppContext} from "../Context/AppContext"
 import toast from 'react-hot-toast'
 
 export default function Navbar() {
-  const {setShowLogin,user,logout , isOwner , setIsOwner , axios } = useAppContext
+  const {setShowLogin,user,logout , isOwner , setIsOwner , axios } = useAppContext()
 
   const location =  useLocation()
   const [open,setOpen] =  useState(false)

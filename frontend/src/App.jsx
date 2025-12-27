@@ -15,11 +15,12 @@ import Footer from './Components/Footer'
 import Login from './Components/Login'
 
 import {Toaster} from "react-hot-toast"
+import { useAppContext } from './Context/AppContext'
 
 export default function App() {
 
 
-    const [showLogin , setShowLogin ] = useState(false)
+    const {showLogin} = useAppContext()
 
     const isOwnerPath =  useLocation().pathname.startsWith('/owner')
 
@@ -29,9 +30,9 @@ export default function App() {
     <Toaster/>
 
    {
-    showLogin &&  <Login setShowLogin={setShowLogin}/>
+    showLogin &&  <Login />
    }
-    {!isOwnerPath &&  <Navbar setShowLogin={setShowLogin}/> }
+    {!isOwnerPath &&  <Navbar /> }
     <Routes>
       <Route path='/' element={<Home/>}/>
       <Route path='/car-details/:id' element={<CarDetails/>}/>
