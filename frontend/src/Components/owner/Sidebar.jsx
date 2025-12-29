@@ -1,18 +1,41 @@
 import React from "react";
 import { assets, dummyUserData, ownerMenuLinks } from "../../assets/assets";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAppContext } from "../../Context/AppContext";
+import toast from "react-hot-toast";
+
 
 export default function Sidebar() {
-  const user = dummyUserData;
+  const {user ,axios, fetchUser}= useAppContext()
   const location = useLocation();
   const [image, setImage] = React.useState("");
   const updateImage = async () => {
-    user.image = URL.createObjectURL(image);
-    setImage("");
+     
+    try {
+      const formData = new FormData()
+      formData.append('image',image)
+      
+      
+      const {data} = await axios.post("/api/owner/update-image",formData)
+        
+      if(data.success) 
+      {
+        fetchUser()
+        toast.success("Image Updated !")
+          setImage('')
+
+        
+      }
+      else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+       toast.error(error.message)
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center pt-8 w-12 md:w-60 border-r border-borderColor text-sm">
+    <div className="min-h-screen min-w-32 flex flex-col items-center pt-8 w-12 md:w-60 border-r border-borderColor text-sm">
       <div className="group relative">
         <label htmlFor="image">
           <img
@@ -41,7 +64,7 @@ export default function Sidebar() {
       {image && (
         <button
           onClick={updateImage}
-          className="absolute top-0 right-0 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer "
+          className="rounded-xl mt-3 flex p-2 gap-1 bg-primary/10 text-primary cursor-pointer "
         >
           Save <img src={assets.check_icon} width={13} alt="" />
         </button>

@@ -24,7 +24,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Fetch dashboard data from API
-    console.log(dummyDashboardData)
+    
     setData(dummyDashboardData);
   }, []);
   return (
