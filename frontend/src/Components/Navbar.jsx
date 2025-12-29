@@ -13,7 +13,7 @@ export default function Navbar() {
   const navigate =  useNavigate()
   const changeRole = async()=>{
     try {
-    const {data} =  await axios.post("/api/owner/change-role")
+    const {data} =  await axios.post("/api/owner/change-role",user)
     if(data.success)
     {
       setIsOwner(true)
@@ -63,7 +63,7 @@ export default function Navbar() {
        
 
        <div className="flex w-full sm:w-auto max-sm:flex-col items-start sm:items-center gap-4 sm:gap-6">
-        <button onClick={()=>{isOwner ? navigate("/owner") : changeRole}} className='cursor-pointer w-full sm:w-auto text-left sm:text-center'>{isOwner ? "Dashboard" : "List Cars"}</button>
+        <button onClick={()=>{isOwner ? navigate("/owner") : changeRole()}} className='cursor-pointer w-full sm:w-auto text-left sm:text-center'>{isOwner ? "Dashboard" : "List Cars"}</button>
         <button onClick={()=>{user ? logout() : setShowLogin(true)}} className='cursor-pointer px-8 py-2 w-full sm:w-auto bg-blue-700 hover:bg-blue-500 transition-all text-white rounded-lg'>{user ? "Log Out":"Log In"}</button>
        </div>
 

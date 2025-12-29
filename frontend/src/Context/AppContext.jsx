@@ -10,7 +10,7 @@ export const AppContext = createContext();
 export const AppProvider = ({ children }) => {
     const navigate = useNavigate();
     const currency = import.meta.env.VITE_CURRENCY;
-    const [token, setToken] = useState(null);
+    const [token, setToken] = useState(localStorage.getItem("token") || null); // Initialize from localStorage
     const [user, setUser] = useState(null);
     const [isOwner, setIsOwner] = useState(false);
     const [showLogin, setShowLogin] = useState(false);
@@ -18,13 +18,37 @@ export const AppProvider = ({ children }) => {
     const [returnDate, setReturnDate] = useState('');
     const [cars, setCars] = useState([]);
 
+    // ✅ ADDED: Login function
+    const login = async (email, password) => {
+        try {
+            const { data } = await axios.post("/api/users/login", { email, password });
+            
+            if (data.success && data.token) {
+                // Save token to localStorage
+                localStorage.setItem("token", data.token);
+                
+                // Update token state (this will trigger the useEffect to fetch user)
+                setToken(data.token);
+                
+                toast.success("Login successful!");
+                return true;
+            } else {
+                toast.error(data.message || "Login failed");
+                return false;
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+            return false;
+        }
+    };
+
     // Function to check user logged in
     const fetchUser = async () => {
         try {
             const { data } = await axios.get("/api/users/data");
             if (data.success) {
                 setUser(data.user);
-                setIsOwner(data.user.role === 'owner');
+                setIsOwner(data.user.role == 'owner');
             } else {
                 navigate("/");
             }
@@ -63,25 +87,25 @@ export const AppProvider = ({ children }) => {
         setIsOwner(false);
         axios.defaults.headers.common['Authorization'] = "";
         toast.success("Log out Successfully!");
-        navigate("/"); // FIXED: Added navigation
+        navigate("/");
     };
 
-    // useEffect to retrieve token from local storage
-    useEffect(() => {
-        const storedToken = localStorage.getItem("token");
-        if (storedToken) {
-            setToken(storedToken);
-            axios.defaults.headers.common["Authorization"] = storedToken; // FIXED: Set headers here
-        }
-        fetchCars();
-    }, []);
-
-    // useEffect to fetch user data when token changes
+    // useEffect to update axios headers whenever token changes
     useEffect(() => {
         if (token) {
-            fetchUser(); // FIXED: Fetch user when token is available
+            axios.defaults.headers.common["Authorization"] = ` ${token}`;
+            fetchUser(); // This will fetch and set user data
+        } else {
+            axios.defaults.headers.common["Authorization"] = "";
+            setUser(null);
+            setIsOwner(false);
         }
-    }, [token]); // FIXED: Added token dependency
+    }, [token]);
+
+    // useEffect to fetch cars on mount
+    useEffect(() => {
+        fetchCars();
+    }, []);
 
     const value = {
         navigate,
@@ -94,6 +118,7 @@ export const AppProvider = ({ children }) => {
         isOwner,
         setIsOwner,
         fetchUser,
+        login, // ✅ ADDED: Login function
         showLogin,
         setShowLogin,
         logout,
