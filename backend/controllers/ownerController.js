@@ -73,7 +73,8 @@ export const getOwnerCars = async (req, res) => {
 
 export const toggleCarAvailability = async (req, res) => {
     try {
-        const {carId} = req.params;
+        console.log(req.params)
+        const {carId} = req.body;
         const car = await Car.findById(carId);
         const {_id} = req.user;
 
@@ -85,6 +86,8 @@ export const toggleCarAvailability = async (req, res) => {
         await car.save();
         res.json({success:true , message: 'Car availability updated successfully'})
     } catch (error) {
+        console.log("here error ");
+        
         res.json({success:false, message: 'Error updating car availability'});
     }   
 }
@@ -93,7 +96,7 @@ export const toggleCarAvailability = async (req, res) => {
 
 export const deleteCar = async (req, res) => {
     try {
-        const {carId} = req.params;
+        const {carId} = req.body;
         const car = await Car.findById(carId);
         const {_id} = req.user;
         // if car belongs to the owner
