@@ -111,40 +111,39 @@ export const deleteCar = async (req, res) => {
 
 
 //get dashboard data 
-export  const getDashboardData = async (req, res) => {
+//get dashboard data 
+export const getDashboardData = async (req, res) => {
     try {
-        const {_id ,role} = req.user;
+        const {_id, role} = req.user;
         if(role !== 'owner'){
-            return res.json({success:false , message: 'You are not authorized to access this data'});
+            return res.json({success: false, message: 'You are not authorized to access this data'});
         }
         const cars = await Car.find({owner: _id});
-        const bookings = await Booking.find({owner: _id}).populate("car").sort({ createdAt : -1});
+        const bookings = await Booking.find({owner: _id}).populate("car").sort({ createdAt: -1});
 
         const pendingBookings = await Booking.find({owner: _id, status: 'pending'});
         const completedBookings = await Booking.find({owner: _id, status: 'confirmed'});
-        // calculate monthly revenue
-        const monthlyRevenue = bookings.slice().filter(booking => {booking.status === 'confirmed'}).reduce((acc, booking) => { acc+booking.price ,0})
-
+        
+        // calculate monthly revenue - FIXED VERSION
+        const monthlyRevenue = bookings
+            .filter(booking => booking.status === 'confirmed')  // Added return (implicit)
+            .reduce((acc, booking) => acc + booking.price, 0);  // Added return and initial value
 
         const dashboardData = {
             totalCars: cars.length,
             totalBookings: bookings.length,
             pendingBookings: pendingBookings.length,
             completedBookings: completedBookings.length,
-            recentBookings: bookings.slice(0,3),
+            recentBookings: bookings.slice(0, 3),
             monthlyRevenue
         }
-        res.json({success:true , dashboardData})
-
+        res.json({success: true, dashboardData})
         
     } catch (error) {
         console.log(error);
-        res.json({success:false, message: 'Error fetching dashboard data'});
-
-        
+        res.json({success: false, message: 'Error fetching dashboard data'});
     }
 }
-
 
 
 // api to update user image
