@@ -1,9 +1,42 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Title from '../Components/Title'
 import { assets, dummyCarData } from '../assets/assets'
 import CarCard from '../Components/CarCard'
+import { useSearchParams } from 'react-router-dom'
+import { useAppContext } from '../Context/AppContext'
+import toast from 'react-hot-toast'
+
 
 export default function Cars() {
+
+  //getting search params from url
+  const [searchParams] = useSearchParams()
+  const pickUpLocation = searchParams.get('pickupLocation')
+  const pickupDate = searchParams.get('pickupDate')
+  const returnDate = searchParams.get('returnDate')
+
+  const {cars,axios} = useAppContext()
+
+  const isSearchedData = pickUpLocation && pickupDate && returnDate
+
+  const [filterdCars, setFilteredCars] = useState([])
+
+  const searchCarAvailability = async()=>{
+
+    const {data} = await axios.post("/api/bookings/check-availability",{location : pickUpLocation , pickupDate ,returnDate})
+
+    if(data.success)
+       setFilteredCars(data.availableCars)
+      if(data.availableCars.length == 0)
+      {
+        toast("No Cars Available ")
+      }
+      return null
+  }
+
+  useEffect(()=>{
+    isSearchedData && searchCarAvailability()
+  },[])
 
   const [input, setInput] = React.useState("")
   return (
@@ -24,11 +57,11 @@ export default function Cars() {
       <div className="px-6 md:px-16 lg:px-24 xl:px-32 mt-10 
       ">
 
-        <p className="">Showing {dummyCarData.length} Cars </p>
+        <p className="">Showing {filterdCars.length} Cars </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4 xl:px-20 max-w-7xl mx-auto ">
 
           {
-            dummyCarData.map((car, index) => (
+            filterdCars.map((car, index) => (
               <div className="" key={index}>
                 <CarCard car={car} />
               </div>
