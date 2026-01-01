@@ -5,10 +5,10 @@ import Cars from "../src/Pages/Cars"
 import CarDetails from './Pages/CarDetails'
 import MyBookings from './Pages/MyBookings'
 import Layout from "./Pages/owner/Layout"
-import Dashboard from './Pages/Owner/Dashboard'
-import AddCar from './Pages/Owner/AddCar'
-import ManageCars from './Pages/Owner/ManageCars'
-import ManageBookings from './Pages/Owner/ManageBookings'
+import Dashboard from './Pages/owner/Dashboard'
+import AddCar from './Pages/owner/AddCar'
+import ManageCars from './Pages/owner/ManageCars'
+import ManageBookings from './Pages/owner/ManageBookings'
 
 import { Route, Routes, useLocation } from 'react-router-dom'
 import Footer from './Components/Footer'
