@@ -39,6 +39,29 @@ export default function Cars() {
   },[])
 
   const [input, setInput] = React.useState("")
+
+const applyFilter = async () => {
+  if (input === "") {  // ✅ Also use === instead of ==
+    setFilteredCars(cars)
+    return null
+  }
+  
+  const filtered = cars.slice().filter((car) => {
+    return car.brand.toLowerCase().includes(input.toLowerCase())      // ✅ toLowerCase
+      || car.model.toLowerCase().includes(input.toLowerCase())        // ✅ toLowerCase
+      || car.category.toLowerCase().includes(input.toLowerCase())     // ✅ toLowerCase
+      || car.transmission.toLowerCase().includes(input.toLowerCase()) // ✅ toLowerCase
+  })
+  
+  setFilteredCars(filtered)  // ✅ filtered (not filterd)
+}
+
+  useEffect(()=>{
+    cars.length > 0 && !isSearchedData && applyFilter()},[input,cars]
+  )
+
+
+
   return (
     <div className=''>
 
