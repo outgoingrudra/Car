@@ -1,9 +1,14 @@
 import React from 'react'
 import { assets } from '../assets/assets'
+import { motion } from 'motion/react'
 
 export default function Banner() {
   return (
-    <div className='relative flex flex-col md:flex-row items-center justify-between px-6 md:px-10 lg:px-14 py-8 md:py-12 bg-gradient-to-br from-[#0558FE] via-[#2B75FF] to-[#A9CFFF] max-w-6xl mx-auto rounded-3xl shadow-2xl overflow-hidden'>
+    <motion.div 
+    initial={{y:50 ,opacity:0}}
+    whileInView={{opacity:1,y:0}}
+    transition={{duration:0.6}}
+    className='relative flex flex-col md:flex-row items-center justify-between px-6 md:px-10 lg:px-14 py-8 md:py-12 bg-gradient-to-br from-[#0558FE] via-[#2B75FF] to-[#A9CFFF] max-w-6xl mx-auto rounded-3xl shadow-2xl overflow-hidden'>
       
       {/* Decorative gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent pointer-events-none"></div>
@@ -21,19 +26,26 @@ export default function Banner() {
         </p>
         
         {/* Button */}
-        <button className='mt-6 px-8 py-3 bg-white hover:bg-gray-50 active:scale-95 transition-all duration-200 text-[#0558FE] font-semibold rounded-xl shadow-lg hover:shadow-xl text-base'>
+        <motion.button 
+        whileHover={{scale:1.05}}
+        whileTap={{scale:0.95}}
+        
+        className='mt-6 px-8 py-3 bg-white hover:bg-gray-50 active:scale-95 transition-all duration-200 text-[#0558FE] font-semibold rounded-xl shadow-lg hover:shadow-xl text-base'>
           List your car
-        </button>
+        </motion.button>
       </div>
 
       {/* Car Image Section */}
       <div className="relative z-10 flex-shrink-0 mt-6 md:mt-0">
-        <img 
+        <motion.img 
+        initial={{opacity:0,x:50}}
+        whileInView={{opacity:1,x:0}}
+        transition={{duration:0.6}}
           src={assets.banner_car_image} 
           alt="Luxury car" 
           className='w-full max-w-sm md:max-w-md lg:max-w-lg h-auto object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-300' 
         />
       </div>
-    </div>
+    </motion.div>
   )
 }
