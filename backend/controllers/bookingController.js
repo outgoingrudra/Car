@@ -12,12 +12,46 @@ const checkAvailability = async (car, pickupDate, returnDate) => {
     return bookings.length === 0;
 }
 
+// Helper function to validate dates
+const validateDates = (pickupDate, returnDate) => {
+    const pickup = new Date(pickupDate);
+    const returnD = new Date(returnDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+
+    // Check if dates are valid
+    if (isNaN(pickup.getTime()) || isNaN(returnD.getTime())) {
+        return { valid: false, message: "Invalid date format" };
+    }
+
+    // Check if pickup date is in the past
+    if (pickup < today) {
+        return { valid: false, message: "Pickup date cannot be in the past" };
+    }
+
+    // Check if return date is before or same as pickup date
+    if (returnD <= pickup) {
+        return { valid: false, message: "Return date must be after pickup date" };
+    }
+
+    return { valid: true };
+}
+
 // API to check car availability for given date and location
 export const checkCarAvailability = async (req, res) => {
     try {
         const { location, pickupDate, returnDate } = req.body;
 
         console.log("Checking availability:", { location, pickupDate, returnDate });
+
+        // ✅ FIXED: Validate dates
+        const validation = validateDates(pickupDate, returnDate);
+        if (!validation.valid) {
+            return res.json({ 
+                success: false, 
+                message: validation.message 
+            });
+        }
 
         // Fetch cars based on location
         const cars = await Car.find({ location, isAvailable: true });
@@ -32,12 +66,10 @@ export const checkCarAvailability = async (req, res) => {
 
         const allCars = await Promise.all(availableCarsPromises);
         
-        // ✅ FIXED: Use let instead of const, and filter correctly
         const availableCars = allCars.filter(car => car.isAvailable === true);
 
         console.log(`${availableCars.length} cars available for the dates`);
 
-        // ✅ FIXED: Changed property name to match frontend (availableCars with capital C)
         res.json({ success: true, availableCars });
 
     } catch (error) {
@@ -51,6 +83,15 @@ export const createBooking = async (req, res) => {
     try {
         const { _id } = req.user;
         const { car, pickupDate, returnDate } = req.body;
+
+        // ✅ FIXED: Validate dates before processing
+        const validation = validateDates(pickupDate, returnDate);
+        if (!validation.valid) {
+            return res.json({ 
+                success: false, 
+                message: validation.message 
+            });
+        }
 
         // Check if car is available
         const isAvailable = await checkAvailability(car, pickupDate, returnDate);
@@ -73,6 +114,15 @@ export const createBooking = async (req, res) => {
         const returned = new Date(returnDate);
 
         const noOfDays = Math.ceil((returned - picked) / (1000 * 60 * 60 * 24));
+        
+        // ✅ FIXED: Double check that noOfDays is positive
+        if (noOfDays <= 0) {
+            return res.json({ 
+                success: false, 
+                message: "Invalid booking duration" 
+            });
+        }
+
         const price = noOfDays * carData.pricePerDay;
 
         await Booking.create({
