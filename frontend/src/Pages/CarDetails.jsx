@@ -31,7 +31,7 @@ export default function CarDetails() {
   };
 
   useEffect(() => {
-    setCar(cars.find((car) => (car._id = id)));
+    setCar(cars.find((car) => (car._id == id)));
   }, [id, cars]);
 
   const containerVariants = {

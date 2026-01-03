@@ -162,7 +162,7 @@ const applyFilter = async () => {
             filterdCars.map((car, index) => (
               <motion.div 
                 className="" 
-                key={index}
+                key={car._id}
                 variants={cardVariants}
                 custom={index}
                 whileHover={{ y: -8 }}
