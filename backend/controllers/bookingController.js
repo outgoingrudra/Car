@@ -12,6 +12,7 @@ const checkAvailability = async (car, pickupDate, returnDate) => {
     return bookings.length === 0;
 }
 
+
 // Helper function to validate dates
 const validateDates = (pickupDate, returnDate) => {
     const pickup = new Date(pickupDate);
@@ -36,6 +37,7 @@ const validateDates = (pickupDate, returnDate) => {
 
     return { valid: true };
 }
+
 
 // API to check car availability for given date and location
 export const checkCarAvailability = async (req, res) => {
@@ -96,6 +98,8 @@ export const createBooking = async (req, res) => {
         // Check if car is available
         const isAvailable = await checkAvailability(car, pickupDate, returnDate);
 
+        
+
         if (!isAvailable) {
             return res.json({ 
                 success: false, 
@@ -108,6 +112,14 @@ export const createBooking = async (req, res) => {
         if (!carData) {
             return res.json({ success: false, message: "Car not found" });
         }
+
+         if (carData.owner.toString() === _id.toString()) {
+            return res.json({
+                success: false,
+                message: "Owner cannot book their own car"
+            });
+        }
+          
 
         // Calculate total amount
         const picked = new Date(pickupDate);

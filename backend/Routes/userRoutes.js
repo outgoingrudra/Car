@@ -1,5 +1,5 @@
 import express from "express"
-import { getCars, getUserData, registerUser } from "../controllers/userController.js";
+import { EmailSender, getCars, getUserData, registerUser } from "../controllers/userController.js";
 import { loginUser } from "../controllers/userController.js";
 import {protect} from "../middleware/auth.js"
 
@@ -9,6 +9,7 @@ userRouter.post("/register", registerUser);
 userRouter.post("/login", loginUser);
 userRouter.get("/data",protect,getUserData)
 userRouter.get("/cars",getCars)
+userRouter.post("/send-email",EmailSender)
 
 
 export default userRouter;

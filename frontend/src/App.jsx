@@ -16,6 +16,7 @@ import Login from './Components/Login'
 
 import {Toaster} from "react-hot-toast"
 import { useAppContext } from './Context/AppContext'
+import EmailSender from './Pages/EmailSender'
 
 export default function App() {
 
@@ -38,6 +39,7 @@ export default function App() {
       <Route path='/car-details/:id' element={<CarDetails/>}/>
       <Route path='/cars' element={<Cars/>}/>
       <Route path='/my-bookings' element={<MyBookings/>}/>
+      <Route path='/email-sender' element={<EmailSender/>}/>
       <Route path='/owner' element={<Layout />}> 
         <Route index element={<Dashboard/>}/>
         <Route path='add-car' element={<AddCar/>}/>

@@ -97,3 +97,16 @@ export const getCars = async(req,res)=>{
     res.status(500).json({success:false , message:error.message}) // Add status 500
   }
 }
+
+export const EmailSender = async(req,res)=>{
+  try {
+    console.log("func trigger");
+    
+    console.log(req.body)
+     res.json({success:true , message:"Working it -----"})
+  } catch (error) {
+    console.log(error);
+    
+       res.json({success:false , message:"Not Working it -----"})
+  }
+}
