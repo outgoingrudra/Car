@@ -1,16 +1,17 @@
 import React from 'react'
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { assets, dummyDashboardData } from '../../assets/assets';
+import { assets } from '../../assets/assets';
 import Title from '../../Components/owner/Title.jsx'
 import { useAppContext } from '../../Context/AppContext.jsx';
-import toast from 'react-hot-toast';
+import OwnerSkeleton from '../../Components/owner/OwnerSkeleton';
 
 export default function Dashboard() {
 
   const {axios, isOwner, currency} = useAppContext()
   
   const [isLoading, setIsLoading] = React.useState(true);
+  const [error, setError] = React.useState("");
 
   const [data, setData] = React.useState({
     totalCars: 0,
@@ -28,30 +29,29 @@ export default function Dashboard() {
     {title: "Confirmed", value: data.completedBookings, icon: assets.listIconColored},
   ]
 
-  const fetchDashboardData = async()=>{
+  const fetchDashboardData = useCallback(async()=>{
     try {
       setIsLoading(true);
+      setError("");
       const {data} = await axios.get("/api/owner/dashboard")
-      if(data) console.log(data);
-      else console.log("No data");
       
       if(data.success) {
         setData(data.dashboardData)
       } else {
-        toast.error(data.message)
+        setError(data.message || "Could not load your dashboard")
       }
       
     } catch (error) {
-      toast.error(error.message)
+      setError(error.response?.data?.message || error.message)
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [axios])
 
   useEffect(() => {
     if(isOwner)
       fetchDashboardData()
-  }, []);
+  }, [isOwner, fetchDashboardData]);
 
   // Animation variants
   const containerVariants = {
@@ -82,40 +82,30 @@ export default function Dashboard() {
     }
   }
 
-  // Loader Component
-  if (isLoading) {
+  if (isLoading || error) {
     return (
-      <div className="px-4 pt-10 md:px-10 flex-1 flex items-center justify-center min-h-screen">
-        <motion.div
-          className="flex flex-col items-center gap-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <motion.div
-            className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          />
-          <p className="text-gray-500 text-lg">Loading Dashboard...</p>
-        </motion.div>
+      <div className="min-w-0 px-4 py-10 md:px-10">
+        <Title title="Owner Dashboard" subTitle="Keep track of your cars, bookings, and monthly revenue." />
+        <div className="my-8 max-w-3xl">
+          {isLoading ? <OwnerSkeleton variant="dashboard" label="Loading your dashboard" /> : <div role="alert" className="rounded-xl border border-red-100 bg-red-50 p-6"><p>{error}</p><button onClick={fetchDashboardData} className="mt-3 font-medium text-primary">Try again</button></div>}
+        </div>
       </div>
     )
   }
 
   return (
     <motion.div 
-      className="px-4 pt-10 md:px-10 flex-1"
+      className="min-w-0 px-4 py-10 md:px-10"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
       <motion.div variants={itemVariants}>
-        <Title title="Admin Dashboard" subTitle="Monitor overall platform performance including total cars, bookings, revenue and recent activities" />
+        <Title title="Owner Dashboard" subTitle="Keep track of your cars, bookings, and monthly revenue." />
       </motion.div>
 
       <motion.div 
-        className="grid sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 my-8 max-w-3xl"
+        className="grid grid-cols-2 lg:grid-cols-4 gap-4 my-8 max-w-3xl"
         variants={containerVariants}
       >
         {
@@ -189,7 +179,7 @@ export default function Dashboard() {
                 </div>
 
                 <div className="">
-                  <p className="">{booking.car.brand} {booking.car.model}</p>
+                  <p className="">{booking.car ? `${booking.car.brand} ${booking.car.model}` : "Car no longer listed"}</p>
                   <p className="text-sm text-gray-500">
                     {booking.createdAt.split('T')[0]}
                   </p>

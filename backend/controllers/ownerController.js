@@ -127,10 +127,12 @@ export const getDashboardData = async (req, res) => {
         const pendingBookings = await Booking.find({owner: _id, status: 'pending'});
         const completedBookings = await Booking.find({owner: _id, status: 'confirmed'});
         
-        // calculate monthly revenue - FIXED VERSION
+        // Count confirmed bookings created in the current calendar month.
+        const now = new Date();
+        const monthStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
         const monthlyRevenue = bookings
-            .filter(booking => booking.status === 'confirmed')  // Added return (implicit)
-            .reduce((acc, booking) => acc + booking.price, 0);  // Added return and initial value
+            .filter(booking => booking.status === 'confirmed' && booking.createdAt >= monthStart)
+            .reduce((acc, booking) => acc + booking.price, 0);
 
         const dashboardData = {
             totalCars: cars.length,

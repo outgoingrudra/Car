@@ -33,10 +33,12 @@ export const AppProvider = ({ children }) => {
                 toast.success("Login successful!");
                 return true;
             } else {
+                if (data.requiresVerification) return "verify";
                 toast.error(data.message || "Login failed");
                 return false;
             }
         } catch (error) {
+            if (error.response?.data?.requiresVerification) return "verify";
             toast.error(error.response?.data?.message || error.message);
             return false;
         }
@@ -50,10 +52,17 @@ export const AppProvider = ({ children }) => {
                 setUser(data.user);
                 setIsOwner(data.user.role == 'owner');
             } else {
+                localStorage.removeItem("token");
+                setToken(null);
                 navigate("/");
             }
         } catch (error) {
             console.log("Error in app context file in user fetch:", error);
+            if ([401, 403].includes(error.response?.status)) {
+                localStorage.removeItem("token");
+                setToken(null);
+                navigate("/");
+            }
             toast.error(error.response?.data?.message || error.message);
         }
     };
@@ -93,7 +102,7 @@ export const AppProvider = ({ children }) => {
     // useEffect to update axios headers whenever token changes
     useEffect(() => {
         if (token) {
-            axios.defaults.headers.common["Authorization"] = ` ${token}`;
+            axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
             fetchUser(); // This will fetch and set user data
         } else {
             axios.defaults.headers.common["Authorization"] = "";

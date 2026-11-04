@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { motion } from 'framer-motion'
 import Title from '../Components/Title'
-import { assets, dummyCarData } from '../assets/assets'
+import { assets } from '../assets/assets'
 import CarCard from '../Components/CarCard'
 import { useSearchParams } from 'react-router-dom'
 import { useAppContext } from '../Context/AppContext'
@@ -19,46 +19,47 @@ export default function Cars() {
 
   const isSearchedData = pickUpLocation && pickupDate && returnDate
 
-  const [filterdCars, setFilteredCars] = useState([])
+  const [availableCars, setAvailableCars] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [input, setInput] = useState("")
+  const [sort, setSort] = useState("featured")
 
-  const searchCarAvailability = async()=>{
-
-    const {data} = await axios.post("/api/bookings/check-availability",{location : pickUpLocation , pickupDate ,returnDate})
-
-    if(data.success)
-       setFilteredCars(data.availableCars)
-      if(data.availableCars.length == 0)
-      {
-        toast("No Cars Available ")
+  useEffect(() => {
+    if (!isSearchedData) return
+    let active = true
+    const search = async () => {
+      setLoading(true)
+      try {
+        const { data } = await axios.post("/api/bookings/check-availability", {
+          location: pickUpLocation, pickupDate, returnDate
+        })
+        if (!active) return
+        if (data.success) setAvailableCars(data.availableCars)
+        else {
+          setAvailableCars([])
+          toast.error(data.message)
+        }
+      } catch (error) {
+        if (active) toast.error(error.response?.data?.message || error.message)
+      } finally {
+        if (active) setLoading(false)
       }
-      return null
-  }
+    }
+    search()
+    return () => { active = false }
+  }, [axios, pickUpLocation, pickupDate, returnDate, isSearchedData])
 
-  useEffect(()=>{
-    isSearchedData && searchCarAvailability()
-  },[])
-
-  const [input, setInput] = React.useState("")
-
-const applyFilter = async () => {
-  if (input === "") {
-    setFilteredCars(cars)
-    return null
-  }
-  
-  const filtered = cars.slice().filter((car) => {
-    return car.brand.toLowerCase().includes(input.toLowerCase())
-      || car.model.toLowerCase().includes(input.toLowerCase())
-      || car.category.toLowerCase().includes(input.toLowerCase())
-      || car.transmission.toLowerCase().includes(input.toLowerCase())
-  })
-  
-  setFilteredCars(filtered)
-}
-
-  useEffect(()=>{
-    cars.length > 0 && !isSearchedData && applyFilter()},[input,cars]
-  )
+  const filteredCars = useMemo(() => {
+    const query = input.trim().toLowerCase()
+    const result = (isSearchedData ? availableCars : cars).filter((car) =>
+      [car.brand, car.model, car.category, car.transmission, car.location]
+        .some((value) => value?.toLowerCase().includes(query))
+    )
+    if (sort === "price-low") result.sort((a, b) => a.pricePerDay - b.pricePerDay)
+    if (sort === "price-high") result.sort((a, b) => b.pricePerDay - a.pricePerDay)
+    if (sort === "newest") result.sort((a, b) => b.year - a.year)
+    return result
+  }, [availableCars, cars, input, isSearchedData, sort])
 
   // Animation variants
   const containerVariants = {
@@ -112,7 +113,7 @@ const applyFilter = async () => {
           <Title title="Available Cars" subTitle="Browse Our Selection of premium vehicles available for you next adventure" />
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="flex items-center bg-white px-4 mt-6 max-w-96 w-full h-12 rounded-full shadow-md"
           variants={searchBarVariants}
           whileHover={{ scale: 1.02, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
@@ -120,17 +121,11 @@ const applyFilter = async () => {
         >
           <img src={assets.search_icon} alt="" className='w-4.5 h-4.5 mr-2' />
           <input 
+            value={input}
             onChange={(e)=>setInput(e.target.value)} 
             type="text"  
             placeholder='Search by make, model or features'  
             className='w-full h-full outline-none text-gray-600'
-          />
-          <motion.img 
-            src={assets.filter_icon} 
-            alt="" 
-            className='w-4.5 h-4.5 mr-2 cursor-pointer' 
-            whileHover={{ rotate: 90 }}
-            transition={{ duration: 0.3 }}
           />
         </motion.div>
 
@@ -143,14 +138,28 @@ const applyFilter = async () => {
         transition={{ duration: 0.5, delay: 0.3 }}
       >
 
-        <motion.p 
-          className=""
+        <motion.div
+          className="flex flex-wrap items-center justify-between gap-3"
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          Showing {filterdCars.length} Cars
-        </motion.p>
+          <p>{loading ? "Checking availability..." : `Showing ${filteredCars.length} cars`}</p>
+          <label className="flex items-center gap-2 text-sm">
+            Sort by
+            <select value={sort} onChange={(event) => setSort(event.target.value)}
+              className="rounded-lg border border-borderColor bg-white px-3 py-2">
+              <option value="featured">Featured</option>
+              <option value="price-low">Price: low to high</option>
+              <option value="price-high">Price: high to low</option>
+              <option value="newest">Newest year</option>
+            </select>
+          </label>
+        </motion.div>
+
+        {!loading && filteredCars.length === 0 && (
+          <p className="mt-8 text-center text-gray-500">No cars match this search. Try another term or date.</p>
+        )}
 
         <motion.div 
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-4 xl:px-20 max-w-7xl mx-auto"
@@ -159,7 +168,7 @@ const applyFilter = async () => {
           animate="visible"
         >
           {
-            filterdCars.map((car, index) => (
+            filteredCars.map((car, index) => (
               <motion.div 
                 className="" 
                 key={car._id}

@@ -32,7 +32,9 @@ const BookingSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true
-  }
+  },
+  confirmationEmailSentAt: Date,
+  confirmationEmailSendingAt: { type: Date, select: false }
 }, { timestamps: true });
 
 const Booking = mongoose.model("Booking", BookingSchema);

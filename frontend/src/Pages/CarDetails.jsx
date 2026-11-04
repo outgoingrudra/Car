@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { assets, dummyCarData } from "../assets/assets";
+import { assets } from "../assets/assets";
 import Loader from "../Components/Loader";
 import { useAppContext } from "../Context/AppContext";
 import toast from "react-hot-toast";
@@ -9,14 +9,26 @@ import toast from "react-hot-toast";
 export default function CarDetails() {
   const { id } = useParams();
 
-  const { cars, axios, pickupDate, setPickupDate, returnDate, setReturnDate } = useAppContext();
+  const { cars, axios, token, setShowLogin, pickupDate, setPickupDate, returnDate, setReturnDate } = useAppContext();
   const navigate = useNavigate();
   const currency = import.meta.env.VITE_CURRENCY;
 
   const [car, setCar] = useState(null);
+  const days = pickupDate && returnDate
+    ? Math.max(0, Math.round((new Date(returnDate) - new Date(pickupDate)) / 86400000))
+    : 0;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!token) {
+      setShowLogin(true);
+      toast("Log in to book this car");
+      return;
+    }
+    if (!days) {
+      toast.error("Return date must be after pickup date");
+      return;
+    }
     try {
       const { data } = await axios.post("/api/bookings/create", { car: id, pickupDate, returnDate });
       if (data.success) {
@@ -229,10 +241,13 @@ export default function CarDetails() {
               onChange={(e) => setReturnDate(e.target.value)}
               type="date"
               id="return-date"
+              min={pickupDate || new Date().toISOString().split("T")[0]}
               className="border border-borderColor px-3 py-2 rounded-lg"
               required
             />
           </motion.div>
+
+          {days > 0 && <p className="text-sm text-gray-600">{days} day{days === 1 ? "" : "s"} × {currency}{car.pricePerDay} = <strong>{currency}{days * car.pricePerDay}</strong></p>}
 
           <motion.button
             className="w-full bg-primary text-white my-2 py-3 rounded-lg font-medium hover:bg-primaryDark transition-colors"

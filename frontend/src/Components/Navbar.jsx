@@ -118,6 +118,7 @@ export default function Navbar() {
           }
 
           <div className="flex items-center gap-4 sm:gap-6">
+            {user && <Link to="/settings" className="hover:text-primary transition-colors">Settings</Link>}
             <motion.button 
               onClick={handleDashboardClick}
               className='cursor-pointer hover:text-primary transition-colors'
@@ -197,6 +198,7 @@ export default function Navbar() {
               </div>
 
               {/* Action Buttons */}
+              {user && <Link to="/settings" onClick={handleLinkClick} className="w-full rounded-lg border border-borderColor px-4 py-3">Account settings</Link>}
               <motion.div 
                 className="flex flex-col gap-4 w-full mt-4"
                 custom={menuLinks.length}

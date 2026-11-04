@@ -1,11 +1,12 @@
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { AppProvider } from "./Context/AppContext.jsx";
 import { MotionConfig } from "motion/react";
 
-createRoot(document.getElementById("root")).render(
+const root = ReactDOM.createRoot(document.getElementById("root"))
+root.render(
   <BrowserRouter>
     <AppProvider>
       <MotionConfig viewport={{once:true}}>

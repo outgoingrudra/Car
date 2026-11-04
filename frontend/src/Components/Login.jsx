@@ -2,52 +2,71 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAppContext } from '../Context/AppContext';
 import toast from 'react-hot-toast';
+import ForgotPassword from './ForgotPassword';
 
 export default function Login() {
-    const { setShowLogin, login, navigate, axios } = useAppContext();
+    const { setShowLogin, setToken, login, navigate, axios } = useAppContext();
     const [state, setState] = React.useState("login");
     const [name, setName] = React.useState("");
     const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
+    const [code, setCode] = React.useState("");
+    const [submitting, setSubmitting] = React.useState(false);
 
     const onSubmitHandler = async (e) => {
         e.preventDefault();
         
-        if (state === "login") {
-            const success = await login(email, password);
-            if (success) {
+        setSubmitting(true);
+        try {
+            if (state === "login") {
+                const result = await login(email, password);
+                if (result === "verify") setState("verify");
+                if (result === true) {
+                    setShowLogin(false);
+                    navigate("/");
+                }
+            } else if (state === "register") {
+                const { data } = await axios.post("/api/users/register", { name, email, password });
+                if (!data.success) throw new Error(data.message);
+                toast.success(data.message);
+                setState("verify");
+            } else {
+                const { data } = await axios.post("/api/users/verify-email", { email, code });
+                if (!data.success) throw new Error(data.message);
+                localStorage.setItem("token", data.token);
+                setToken(data.token);
+                toast.success(data.message);
                 setShowLogin(false);
                 navigate("/");
             }
-        } else {
-            try {
-                const { data } = await axios.post(`/api/users/${state}`, {
-                    name,
-                    email,
-                    password
-                });
-                console.log(data);
-                
-                if (data.success) {
-                    const loginSuccess = await login(email, password);
-                    if (loginSuccess) {
-                        setShowLogin(false);
-                        navigate("/");
-                    }
-                } else {
-                    toast.error(data.message);
-                }
-            } catch (error) {
-                toast.error(error.response?.data?.message || error.message);
-            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const resendCode = async () => {
+        setSubmitting(true);
+        try {
+            const { data } = await axios.post("/api/users/resend-verification", { email });
+            if (!data.success) throw new Error(data.message);
+            toast.success(data.message);
+        } catch (error) {
+            toast.error(error.response?.data?.message || error.message);
+        } finally {
+            setSubmitting(false);
         }
     };
 
     // Clear form when switching between login/register
     React.useEffect(() => {
-        setName("");
-        setEmail("");
-        setPassword("");
+        if (state !== "verify") {
+            setName("");
+            setEmail("");
+            setPassword("");
+            setCode("");
+        }
     }, [state]);
 
     // Animation variants
@@ -98,6 +117,7 @@ export default function Login() {
         })
     };
 
+    if (state === "forgot") return <ForgotPassword onBack={() => setState("login")} />;
     return (
         <motion.div 
             onClick={() => setShowLogin(false)} 
@@ -123,7 +143,7 @@ export default function Login() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2, duration: 0.4 }}
                 >
-                    <span className="text-primary">User</span> {state === "login" ? "Login" : "Sign Up"}
+                    <span className="text-primary">User</span> {state === "login" ? "Login" : state === "register" ? "Sign Up" : "Verify Email"}
                 </motion.p>
 
                 <AnimatePresence mode="wait">
@@ -158,7 +178,7 @@ export default function Login() {
                     )}
                 </AnimatePresence>
 
-                <motion.div 
+                {state !== "verify" && <motion.div
                     className="w-full"
                     custom={state === "register" ? 1 : 0}
                     variants={inputVariants}
@@ -174,9 +194,9 @@ export default function Login() {
                         type="email" 
                         required 
                     />
-                </motion.div>
+                </motion.div>}
 
-                <motion.div 
+                {state !== "verify" && <motion.div
                     className="w-full"
                     custom={state === "register" ? 2 : 1}
                     variants={inputVariants}
@@ -192,14 +212,27 @@ export default function Login() {
                         type="password" 
                         required 
                     />
-                </motion.div>
+                </motion.div>}
+
+                {state === "login" && <button type="button" onClick={() => setState("forgot")} className="text-sm text-primary">Forgot password?</button>}
+                {state === "verify" && <div className="w-full">
+                    <p className="mb-2 text-sm">Enter the six digit code sent to <strong>{email}</strong>.</p>
+                    <input value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        type="text" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}"
+                        placeholder="Verification code" required
+                        className="border border-gray-200 rounded w-full p-2 outline-primary focus:border-primary" />
+                    <button type="button" onClick={resendCode} disabled={submitting}
+                        className="text-primary mt-3 disabled:opacity-50">Resend code</button>
+                </div>}
 
                 <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4, duration: 0.3 }}
                 >
-                    {state === "register" ? (
+                    {state === "verify" ? (
+                        <>Wrong email? <button type="button" onClick={() => setState("register")} className="text-primary">Sign up again</button></>
+                    ) : state === "register" ? (
                         <>
                             Already have account? <motion.span 
                                 onClick={() => setState("login")} 
@@ -225,6 +258,7 @@ export default function Login() {
                 </motion.p>
 
                 <motion.button 
+                    disabled={submitting}
                     className="bg-primary hover:bg-blue-600 transition-all text-white w-full py-2 rounded-md cursor-pointer"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -232,7 +266,7 @@ export default function Login() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5, duration: 0.3 }}
                 >
-                    {state === "register" ? "Create Account" : "Login"}
+                    {submitting ? "Please wait..." : state === "register" ? "Send verification code" : state === "verify" ? "Verify email" : "Login"}
                 </motion.button>
             </motion.form>
         </motion.div>

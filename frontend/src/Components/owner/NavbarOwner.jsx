@@ -1,5 +1,5 @@
 import React from 'react'
-import { assets, dummyUserData } from '../../assets/assets'
+import { assets } from '../../assets/assets'
 import { Link } from 'react-router-dom';
 import {useAppContext} from "../../Context/AppContext"
 
@@ -14,9 +14,7 @@ export default function NavbarOwner() {
     <img src={assets.logo} alt=""  className='h-7'/>
     
     </Link>
-    <p className="">
-        Welcome , {user?.name || 'Owner'}
-    </p>
+    <div className="flex items-center gap-4"><Link to="/owner/settings" className="text-sm font-medium text-primary">Settings</Link><p className="hidden sm:block">Welcome, {user?.name || 'Owner'}</p></div>
    </div>
   )
 }

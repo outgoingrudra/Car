@@ -1,263 +1,118 @@
-import React, { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import Title from "../../Components/owner/Title";
-import { assets } from "../../assets/assets";
+import { assets, cityList } from "../../assets/assets";
 import { useAppContext } from "../../Context/AppContext";
 import toast from "react-hot-toast";
+import OwnerSkeleton, { InlineSpinner } from "../../Components/owner/OwnerSkeleton";
+
+const emptyCar = { brand: "", model: "", year: "", pricePerDay: "", category: "", transmission: "", fuel_type: "", seating_capacity: "", location: "", description: "" };
+const choices = {
+  category: ["Sedan", "SUV", "VAN"],
+  transmission: ["Automatic", "Manual", "Semi-Manual"],
+  fuel_type: ["Gas", "Diesel", "Petrol", "Electric", "Hybrid"],
+  location: cityList
+};
 
 export default function AddCar() {
+  const { id } = useParams();
+  const { axios, currency, fetchCars, navigate } = useAppContext();
+  const [car, setCar] = useState(emptyCar);
   const [image, setImage] = useState(null);
-  const { axios, currency } = useAppContext();
-  const [car, setCar] = useState({
-    brand: "",
-    model: "",
-    year: 0,
-    pricePerDay: 0,
-    category: "",
-    transmission: "",
-    fuel_type: "",
-    seating_capacity: 0,
-    location: "",
-    description: "",
-  });
+  const [preview, setPreview] = useState("");
+  const [existingImage, setExistingImage] = useState("");
+  const [loading, setLoading] = useState(Boolean(id));
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
+  const fileInput = useRef(null);
 
-  const [isloading, setIsloading] = useState(false);
-  const onsubmitHandler = async (e) => {
-     e.preventDefault();
-    if (isloading) {
-      return null;
-    }
-    setIsloading(true);
+  useEffect(() => {
+    let active = true;
+    setImage(null);
+    setError("");
+    if (!id) { setCar(emptyCar); setExistingImage(""); setLoading(false); return; }
+    setLoading(true);
+    axios.get(`/api/owner/cars/${id}`).then(({ data }) => {
+      if (!active) return;
+      if (!data.success) throw new Error(data.message);
+      setCar(Object.fromEntries(Object.keys(emptyCar).map((key) => [key, data.car[key]])));
+      setExistingImage(data.car.image);
+    }).catch((err) => { if (active) setError(err.response?.data?.message || err.message); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [id, axios]);
+
+  useEffect(() => {
+    if (!image) { setPreview(""); return; }
+    const url = URL.createObjectURL(image);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
+
+  const save = async (event) => {
+    event.preventDefault();
+    if (saving) return;
+    if (!id && !image) { toast.error("Choose a car photo"); return; }
+    setSaving(true);
     try {
-      const formData = new FormData();
-      formData.append("image", image);
-      formData.append("carData", JSON.stringify(car));
-
-      const { data } = await axios.post("/api/owner/add-car", formData);
-
-      if (data.success) {
-        toast.success(data.message);
-        setImage(null);
-        setCar({
-          brand: "",
-          model: "",
-          year: 0,
-          pricePerDay: 0,
-          category: "",
-          transmission: "",
-          fuel_type: "",
-          seating_capacity: 0,
-          location: "",
-          description: "",
-        });
-      }
-      else{
-        toast.error(data.message)
-      }
-    } catch (error) {
-      toast.error(error.message)
-    }
-    finally{
-      setIsloading(false)
-    }
+      const body = new FormData();
+      if (image) body.append("image", image);
+      body.append("carData", JSON.stringify(car));
+      const { data } = id ? await axios.patch(`/api/owner/cars/${id}`, body) : await axios.post("/api/owner/add-car", body);
+      if (!data.success) throw new Error(data.message);
+      toast.success(data.message);
+      await fetchCars();
+      if (id) navigate("/owner/manage-cars");
+      else { setCar(emptyCar); setImage(null); if (fileInput.current) fileInput.current.value = ""; }
+    } catch (err) { toast.error(err.response?.data?.message || err.message); }
+    finally { setSaving(false); }
   };
 
-  return (
-    <div className="px-4 py-10 md:px-10 flex-1">
-      <Title
-        title="ADD NEW CAR "
-        subTitle="Fill in Details to list a new car for booking , including pricing , availability and car specification "
-      />
-
-      <form
-        action=""
-        onSubmit={onsubmitHandler}
-        className="flex flex-col gap-5 text-gray-500 text-sm mt-6 max-w-xl"
-      >
-        {/* car image  */}
-        <div className="flex items-center  gap-2 w-full">
-          <label htmlFor="car-image">
-            <img
-              src={image ? URL.createObjectURL(image) : assets.upload_icon}
-              alt=""
-              className="h-14 rounded cursor-pointer"
-            />
-            <input
-              type="file"
-              name=""
-              id="car-image"
-              accept="image/*"
-              hidden
-              onChange={(e) => setImage(e.target.files[0])}
-            />
-          </label>
-          <p className="text-sm text-gray-500"> Upload a picture of the car</p>
-        </div>
-
-        {/* car brand and model  */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Brand </label>
-            <input
-              type="text"
-              placeholder="e.g- BMW , Mercedes ..."
-              required
-              className="px-3 py-2 
-                mt-1  border border-borderColor rounded-md outline-none"
-              value={car.brand}
-              onChange={(e) => setCar({ ...car, brand: e.target.value })}
-            />
-          </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Model </label>
-            <input
-              type="text"
-              placeholder="e.g- X5 , E-Class ..."
-              required
-              className="px-3 py-2 
-                mt-1  border border-borderColor rounded-md outline-none"
-              value={car.model}
-              onChange={(e) => setCar({ ...car, model: e.target.value })}
-            />
-          </div>
-        </div>
-
-        {/* car Year , Price Category  */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Year </label>
-            <input
-              type="number"
-              placeholder="e.g- 2024,2025....."
-              required
-              className="px-3 py-2 
-                mt-1  border border-borderColor rounded-md outline-none"
-              value={car.year}
-              onChange={(e) => setCar({ ...car, year: e.target.value })}
-            />
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label htmlFor="">daily Price ({currency})</label>
-            <input
-              type="number"
-              placeholder="e.g- 100"
-              required
-              className="px-3 py-2 
-                mt-1  border border-borderColor rounded-md outline-none"
-              value={car.pricePerDay}
-              onChange={(e) => setCar({ ...car, pricePerDay: e.target.value })}
-            />
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Category</label>
-            <select
-              name=""
-              id=""
-              className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none"
-              onChange={(e) => setCar({ ...car, category: e.target.value })}
-              value={car.category}
-            >
-              <option value="">Select a category</option>
-              <option value="Sedan">Sedan</option>
-              <option value="SUV">SUV</option>
-              <option value="VAN">VAN</option>
-            </select>
-          </div>
-        </div>
-
-        {/* car transmission , Fuel Type , Seating Capacity  */}
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 ">
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Transmission</label>
-            <select
-              name=""
-              id=""
-              className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none"
-              onChange={(e) => setCar({ ...car, transmission: e.target.value })}
-              value={car.transmission}
-            >
-              <option value="">Select a transmission</option>
-              <option value="Automatic">Automatic</option>
-              <option value="Manual">Manual</option>
-              <option value="Semi-Manual">Semi-Manual</option>
-            </select>
-          </div>
-
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Fuel Type</label>
-            <select
-              name=""
-              id=""
-              className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none"
-              onChange={(e) => setCar({ ...car, fuel_type: e.target.value })}
-              value={car.fuel_type}
-            >
-              <option value="">Select a Fuel Type</option>
-              <option value="Gas">Gas</option>
-              <option value="Disel">Disel</option>
-              <option value="Petrol">Petrol</option>
-              <option value="Electric">Electric</option>
-              <option value="Hybrid">Hybrid</option>
-            </select>
-          </div>
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Seating Capacity </label>
-            <input
-              type="number"
-              placeholder="4"
-              required
-              className="px-3 py-2 
-                mt-1  border border-borderColor rounded-md outline-none"
-              value={car.seating_capacity}
-              onChange={(e) =>
-                setCar({ ...car, seating_capacity: e.target.value })
+  if (loading) return <div className="flex-1 px-4 py-10 md:px-10"><Title title="Edit Car" subTitle="Loading your listing details." /><div className="mt-6"><OwnerSkeleton variant="form" label="Loading car details" /></div></div>;
+  if (error) return <div className="p-10"><p role="alert">{error}</p><Link to="/owner/manage-cars" className="text-primary">Back to cars</Link></div>;
+  const inputClass = "mt-1 w-full rounded-md border border-borderColor bg-white px-3 py-2 outline-primary";
+  const fields = [
+    ["brand", "Brand", "text"], ["model", "Model", "text"],
+    ["year", "Year", "number", { min: 1886, max: new Date().getFullYear() + 1 }],
+    ["pricePerDay", `Daily price (${currency})`, "number", { min: 1, max: 1000000, step: "0.01" }],
+    ["category", "Category"], ["transmission", "Transmission"], ["fuel_type", "Fuel type"],
+    ["seating_capacity", "Seats", "number", { min: 1, max: 50 }], ["location", "Pickup location"]
+  ];
+  return <div className="flex-1 px-4 py-10 md:px-10">
+    <Title title={id ? "Edit Car" : "Add New Car"} subTitle={id ? "Update the listing. Existing booking totals stay the same." : "Add your car's details and a photo to start accepting reservations."} />
+    <form onSubmit={save} className="mt-6 max-w-2xl space-y-5 text-sm text-gray-600">
+      <fieldset disabled={saving} className="space-y-5">
+        <div className="flex flex-wrap items-center gap-4">
+          <img src={preview || existingImage || assets.upload_icon} alt="Car preview" className="h-28 w-44 rounded-lg bg-gray-50 object-contain" />
+          <label className="block">{id ? "Replace photo (optional)" : "Car photo"}
+            <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" className="mt-2 block max-w-full" onChange={(event) => {
+              const file = event.target.files[0];
+              if (file && (file.size > 5 * 1024 * 1024 || !["image/jpeg", "image/png", "image/webp"].includes(file.type))) {
+                toast.error("Choose a JPG, PNG or WebP image up to 5 MB"); event.target.value = ""; return;
               }
-            />
-          </div>
+              setImage(file || null);
+            }} />
+            <span className="text-xs text-gray-400">JPG, PNG or WebP · up to 5 MB</span>
+          </label>
         </div>
-        {/* car location */}
-
-        <div className="flex flex-col w-full">
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Location</label>
-            <select
-              name=""
-              id=""
-              className="px-3 py-2 mt-1 border border-borderColor rounded-md outline-none"
-              onChange={(e) => setCar({ ...car, location: e.target.value })}
-              value={car.location}
-            >
-              <option value="">Select a location</option>
-              <option value="New York">New York</option>
-              <option value="Los Angeles">Los Angeles</option>
-              <option value="Houstan">Houstan</option>
-              <option value="Chicago">Chicago</option>
-            </select>
-          </div>
-          {/* car description */}
-          <div className="flex flex-col w-full">
-            <label htmlFor="">Description</label>
-            <textarea
-              rows={5}
-              placeholder="Lorem ipsum dolor sit amet consectetur adipisicing elit. Animi, inventore."
-              required
-              className="px-3 py-2 
-                mt-1  border border-borderColor rounded-md outline-none"
-              value={car.description}
-              onChange={(e) => setCar({ ...car, description: e.target.value })}
-            ></textarea>
-          </div>
-          <button
-            className="flex items-center gap-2 px-4 py-2.5 mt-4 bg-primary text-white rounded-md font-medium
-              w-max cursor-pointer"
-          >
-            <img src={assets.tick_icon} alt="" />
-         {  isloading ? "Listing...": "List Your Car"}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {fields.map(([key, label, type, constraints]) => <label key={key} className="block">{label}
+            {choices[key] ? <select required className={inputClass} value={car[key]} onChange={(e) => setCar({ ...car, [key]: e.target.value })}>
+              <option value="">Select {label.toLowerCase()}</option>
+              {car[key] && !choices[key].includes(car[key]) && <option value={car[key]}>{car[key]}</option>}
+              {choices[key].map((value) => <option key={value} value={value}>{value}</option>)}
+            </select> : <input required type={type} {...constraints} maxLength={type === "text" ? 120 : undefined} className={inputClass} value={car[key]} onChange={(e) => setCar({ ...car, [key]: e.target.value })} />}
+          </label>)}
+        </div>
+        <label className="block">Description<textarea required maxLength={3000} rows={5} className={inputClass} value={car.description} onChange={(e) => setCar({ ...car, description: e.target.value })} /></label>
+        <div className="flex flex-col gap-3 border-t border-slate-200 pt-6 sm:flex-row sm:items-center sm:gap-4">
+          <button type="submit" disabled={saving} aria-busy={saving} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-primary px-8 py-3 text-base font-semibold text-white shadow-sm transition-colors hover:bg-primary-dull focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-wait disabled:opacity-70 sm:w-auto sm:min-w-[220px]">
+            {saving ? <InlineSpinner /> : <img src={assets.tick_icon} alt="" className="h-5 w-5" />}
+            {saving ? "Saving your car..." : id ? "Save changes" : "List your car"}
           </button>
+          <Link to="/owner/manage-cars" className="inline-flex min-h-12 items-center justify-center rounded-lg px-5 text-sm font-medium text-gray-600 hover:bg-slate-50">Cancel</Link>
         </div>
-      </form>
-    </div>
-  );
+      </fieldset>
+    </form>
+  </div>;
 }

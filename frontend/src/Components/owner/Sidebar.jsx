@@ -1,5 +1,5 @@
 import React from "react";
-import { assets, dummyUserData, ownerMenuLinks } from "../../assets/assets";
+import { assets, ownerMenuLinks } from "../../assets/assets";
 import { NavLink, useLocation } from "react-router-dom";
 import { useAppContext } from "../../Context/AppContext";
 import toast from "react-hot-toast";
@@ -35,7 +35,7 @@ export default function Sidebar() {
   };
 
   return (
-    <div className="min-h-screen min-w-32 flex flex-col items-center pt-8 w-12 md:w-60 border-r border-borderColor text-sm">
+    <div className="min-h-screen w-16 shrink-0 flex flex-col items-center pt-8 md:w-60 border-r border-borderColor text-sm">
       <div className="group relative">
         <label htmlFor="image">
           <img

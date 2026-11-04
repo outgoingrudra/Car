@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { assets, cityList } from '../assets/assets'
 import { useAppContext } from '../Context/AppContext'
 import {motion}  from "motion/react"
+import toast from 'react-hot-toast'
 
 export default function Hero() {
 
@@ -11,7 +12,11 @@ export default function Hero() {
 
   const handleSearch = async(e)=>{
          e.preventDefault();
-         navigate("/cars?pickupLocation="+pickUp+"&pickupDate="+pickupDate+"&returnDate="+returnDate)
+         if (returnDate <= pickupDate) {
+           toast.error("Return date must be after pickup date")
+           return
+         }
+         navigate(`/cars?${new URLSearchParams({ pickupLocation: pickUp, pickupDate, returnDate })}`)
 
   }
   return (
@@ -56,7 +61,7 @@ export default function Hero() {
 
 <div className="flex flex-col items-start w-full md:w-auto md:flex-1 cursor-pointer" onClick={() => document.getElementById('return-date').showPicker()}>
   <label htmlFor="return-date" className='px-2 text-sm font-medium pointer-events-none'>Return Date</label>
-  <input value={returnDate} onChange={(e)=>setReturnDate(e.target.value)} type="date" name="" id="return-date" className='w-full px-2 py-1 text-sm text-gray-500 outline-none bg-transparent pointer-events-none' required />
+  <input value={returnDate} onChange={(e)=>setReturnDate(e.target.value)} type="date" name="" id="return-date" min={pickupDate || new Date().toISOString().split('T')[0]} className='w-full px-2 py-1 text-sm text-gray-500 outline-none bg-transparent pointer-events-none' required />
 </div>
         <motion.button 
         whileHover={{scale:1.05}}

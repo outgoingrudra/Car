@@ -8,7 +8,8 @@ import toast from 'react-hot-toast'
 export default function MyBookings() {
   const [bookings, setBookings] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const {axios, user, currency} = useAppContext() 
+  const [cancellingId, setCancellingId] = React.useState(null);
+  const {axios, user, token, setShowLogin, currency} = useAppContext()
 
   const fetchBookings = async () => {
     try {
@@ -29,6 +30,24 @@ export default function MyBookings() {
   useEffect(() => {
     user && fetchBookings();
   }, [user]);
+
+  const cancelBooking = async (bookingId) => {
+    if (!window.confirm("Cancel this booking?")) return;
+    setCancellingId(bookingId);
+    try {
+      const { data } = await axios.patch(`/api/bookings/${bookingId}/cancel`);
+      if (!data.success) throw new Error(data.message);
+      setBookings((current) => current.map((booking) =>
+        booking._id === bookingId ? { ...booking, status: "cancelled" } : booking
+      ));
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
+    } finally {
+      setCancellingId(null);
+    }
+  };
+
 
   // Animation variants
   const containerVariants = {
@@ -63,6 +82,10 @@ export default function MyBookings() {
   };
 
   // Loader Component
+  if (!token) return <div className="text-center py-20">
+    <p>Log in to view your bookings.</p>
+    <button className="mt-4 text-primary" onClick={() => setShowLogin(true)}>Log in</button>
+  </div>;
   if (isLoading) {
     return (
       <div className="px-6 md:px-16 lg:px-24 xl:px-32 2xl:px-48 mt-16 text-sm max-w-7xl flex items-center justify-center min-h-[60vh]">
@@ -116,7 +139,7 @@ export default function MyBookings() {
           bookings.map((booking, index) => (
             <motion.div
               className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border border-borderColor rounded-lg mt-5 first:mt-12"
-              key={index}
+              key={booking._id}
               variants={cardVariants}
               whileHover={{ 
                 y: -5, 
@@ -135,17 +158,17 @@ export default function MyBookings() {
                   transition={{ duration: 0.3 }}
                 >
                   <img
-                    src={booking.car.image}
+                    src={booking.car?.image}
                     alt=""
                     className="w-full h-auto aspect-video object-cover"
                   />
                 </motion.div>
                 <p className="text-lg font-medium mt-2">
-                  {booking.car.brand} {booking.car.model}
+                  {booking.car?.brand || "Car no longer listed"} {booking.car?.model}
                 </p>
                 <p className="text-gray-500">
-                  {booking.car.year} . {booking.car.category} .{" "}
-                  {booking.car.location}
+                  {booking.car?.year} . {booking.car?.category} .{" "}
+                  {booking.car?.location}
                 </p>
               </motion.div>
 
@@ -163,9 +186,11 @@ export default function MyBookings() {
                   </motion.p>
                   <motion.p
                     className={`px-3 py-1 text-xs rounded-full ${
-                      booking.status == "confirmed"
+                      booking.status === "confirmed"
                         ? "bg-green-400/15 text-green-600"
-                        : "bg-red-400/15 text-red-600"
+                        : booking.status === "pending"
+                          ? "bg-amber-400/15 text-amber-700"
+                          : "bg-red-400/15 text-red-600"
                     }`}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -210,7 +235,7 @@ export default function MyBookings() {
                   <div className="">
                     <p className="text-gray-500">Pick Up Location</p>
                     <p className="">
-                      {booking.car.location}
+                      {booking.car?.location || "Unavailable"}
                     </p>
                   </div>
                 </motion.div>
@@ -235,6 +260,14 @@ export default function MyBookings() {
                     Booked on {booking.createdAt.split("T")[0]}
                   </p>
                 </div>
+                {["pending", "confirmed"].includes(booking.status) &&
+                  booking.pickupDate.slice(0, 10) > new Date().toISOString().slice(0, 10) && (
+                    <button type="button" onClick={() => cancelBooking(booking._id)}
+                      disabled={cancellingId === booking._id}
+                      className="self-end rounded-lg border border-red-300 px-4 py-2 text-red-600 hover:bg-red-50 disabled:opacity-50">
+                      {cancellingId === booking._id ? "Cancelling..." : "Cancel booking"}
+                    </button>
+                  )}
               </motion.div>
             </motion.div>
           ))

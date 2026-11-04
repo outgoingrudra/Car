@@ -1,10 +1,12 @@
 import Booking from "../models/Booking.js";
 import Car from "../models/Car.js";
+import { notifyBookingConfirmation } from "../services/bookingNotifications.js";
 
 // Helper function to check car availability
 const checkAvailability = async (car, pickupDate, returnDate) => {
     const bookings = await Booking.find({
         car,
+        status: { $ne: "cancelled" },
         pickupDate: { $lt: returnDate },
         returnDate: { $gt: pickupDate }
     });
@@ -18,7 +20,7 @@ const validateDates = (pickupDate, returnDate) => {
     const pickup = new Date(pickupDate);
     const returnD = new Date(returnDate);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    today.setUTCHours(0, 0, 0, 0); // Date inputs are stored at midnight UTC.
 
     // Check if dates are valid
     if (isNaN(pickup.getTime()) || isNaN(returnD.getTime())) {
@@ -44,8 +46,6 @@ export const checkCarAvailability = async (req, res) => {
     try {
         const { location, pickupDate, returnDate } = req.body;
 
-        console.log("Checking availability:", { location, pickupDate, returnDate });
-
         // ✅ FIXED: Validate dates
         const validation = validateDates(pickupDate, returnDate);
         if (!validation.valid) {
@@ -58,8 +58,6 @@ export const checkCarAvailability = async (req, res) => {
         // Fetch cars based on location
         const cars = await Car.find({ location, isAvailable: true });
 
-        console.log(`Found ${cars.length} cars in ${location}`);
-
         // Check availability for each car
         const availableCarsPromises = cars.map(async (car) => {
             const isAvailable = await checkAvailability(car._id, pickupDate, returnDate);
@@ -69,8 +67,6 @@ export const checkCarAvailability = async (req, res) => {
         const allCars = await Promise.all(availableCarsPromises);
         
         const availableCars = allCars.filter(car => car.isAvailable === true);
-
-        console.log(`${availableCars.length} cars available for the dates`);
 
         res.json({ success: true, availableCars });
 
@@ -95,22 +91,15 @@ export const createBooking = async (req, res) => {
             });
         }
 
-        // Check if car is available
-        const isAvailable = await checkAvailability(car, pickupDate, returnDate);
-
-        
-
-        if (!isAvailable) {
+        const carData = await Car.findById(car);
+        if (!carData || !carData.isAvailable) {
             return res.json({ 
                 success: false, 
-                message: "Car is not available for the selected dates" 
+                message: "Car is no longer available"
             });
         }
-
-        const carData = await Car.findById(car);
-
-        if (!carData) {
-            return res.json({ success: false, message: "Car not found" });
+        if (!(await checkAvailability(car, pickupDate, returnDate))) {
+            return res.json({ success: false, message: "Car is not available for the selected dates" });
         }
 
          if (carData.owner.toString() === _id.toString()) {
@@ -160,7 +149,7 @@ export const getUserBookings = async (req, res) => {
         const { _id } = req.user;
         const bookings = await Booking.find({ user: _id })
             .populate("car")
-            .populate("owner")
+            .populate("owner", "name email image")
             .sort({ createdAt: -1 });
 
         res.json({ success: true, bookings });
@@ -179,8 +168,8 @@ export const getOwnerBookings = async (req, res) => {
         }
 
         const bookings = await Booking.find({ owner: req.user._id })
-            .populate("car user")
-            .select("-user.password")
+            .populate("car")
+            .populate("user", "name email image")
             .sort({ createdAt: -1 });
 
         res.json({ success: true, bookings });
@@ -197,19 +186,28 @@ export const changeBookingStatus = async (req, res) => {
         const { _id } = req.user;
         const { bookingid, status } = req.body;
 
-        const booking = await Booking.findById(bookingid);
-
+        if (req.user.role !== "owner" || !["confirmed", "cancelled"].includes(status)) {
+            return res.status(400).json({ success: false, message: "Invalid status change" });
+        }
+        const booking = await Booking.findOneAndUpdate(
+            { _id: bookingid, owner: _id, status: "pending" },
+            { status },
+            { new: true }
+        );
         if (!booking) {
-            return res.json({ success: false, message: "Booking not found" });
+            return res.status(409).json({ success: false, message: "Booking is unavailable or already updated" });
         }
 
-        if (booking.owner.toString() !== _id.toString()) {
-            return res.json({ success: false, message: "Access denied" });
+        if (status === "confirmed") {
+            try {
+                const emailSent = await notifyBookingConfirmation(booking._id, _id);
+                return res.json({ success: true, emailSent, message: emailSent
+                    ? "Booking confirmed and email sent to the renter"
+                    : "Booking confirmed. Email is already sent or being processed." });
+            } catch {
+                return res.json({ success: true, emailSent: false, warning: "Booking confirmed, but the email could not be sent. Use Retry email.", message: "Booking confirmed" });
+            }
         }
-
-        booking.status = status;
-        await booking.save();
-
         res.json({ success: true, message: "Booking status updated successfully" });
 
     } catch (error) {
@@ -217,3 +215,38 @@ export const changeBookingStatus = async (req, res) => {
         res.json({ success: false, message: "Server Error" });
     }
 }
+
+export const retryConfirmationEmail = async (req, res) => {
+    try {
+        if (req.user.role !== "owner") return res.status(403).json({ success: false, message: "Access denied" });
+        const emailSent = await notifyBookingConfirmation(req.params.id, req.user._id);
+        if (!emailSent) return res.status(409).json({ success: false, message: "Email already sent, in progress, or booking unavailable" });
+        res.json({ success: true, message: "Confirmation email sent" });
+    } catch {
+        res.status(503).json({ success: false, message: "Email could not be sent. Please retry shortly." });
+    }
+};
+
+// Renters can cancel a reservation until its pickup day begins.
+export const cancelBooking = async (req, res) => {
+    try {
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        const booking = await Booking.findOneAndUpdate(
+            {
+                _id: req.params.id,
+                user: req.user._id,
+                status: { $in: ["pending", "confirmed"] },
+                pickupDate: { $gt: today }
+            },
+            { status: "cancelled" },
+            { new: true }
+        );
+        if (!booking) {
+            return res.status(409).json({ success: false, message: "This booking cannot be cancelled" });
+        }
+        res.json({ success: true, message: "Booking cancelled", booking });
+    } catch (error) {
+        res.status(400).json({ success: false, message: "Invalid booking" });
+    }
+};
